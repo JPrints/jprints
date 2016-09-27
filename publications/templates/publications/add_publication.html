@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %} Add Publication {% endblock %}
+
+{% block body_block %}
+        <h1>Add a Publication</h1>
+        <div>
+            <form id="publication_form" method="post" action="{% url 'publication:add_publication' %}">
+                {% csrf_token %}
+                {% for hidden in form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+                {% for field in form.visible_fields %}
+                    {{ field.errors }}
+                    {{ field.help_text }}
+                    {{ field }}<br/>
+                {% endfor %}
+                <input type="submit" name="submit" value="Add a Publication" />
+            </form>
+        </div>
+{% endblock %}
+
+

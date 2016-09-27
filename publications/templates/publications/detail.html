@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %} Publication Details {% endblock %}
+
+{% block body_block %}
+        <img  width="100px" height="106px" src="{% static "images/Django_Reinhardt.jpg" %}" alt="Logo" />
+    {% if publication %}
+
+        <table>
+            <tr>
+                <td>id</td><td>{{ publication.id}}</td>
+            </tr>
+ 
+            <tr>
+                <td>Status</td><td>{{ publication.status}}</td>
+            </tr>
+            <tr>
+                <td>Type</td><td>{{ publication.publication_type}}</td>
+            </tr>
+            <tr>
+                <td>Publication Status</td><td>{{ publication.publication_status}}</td>
+            </tr>
+            <tr>
+                <td>Visibilty</td><td>{{ publication.visibility_status}}</td>
+            </tr>
+            <tr>
+                <td>Title</td><td>{{ publication.title }}</td>
+            </tr>
+            <tr>
+                <td>Abstract</td><td>{{ publication.abstract}}</td>
+            </tr>
+            <tr>
+                <td>Subjects</td><td>{{ publication.subject}}</td>
+            </tr>
+            <tr>
+                <td>Divisions</td><td>{{ publication.divisions}}</td>
+            </tr>
+            <tr>
+                <td>Last Modified</td><td>{{ publication.lastmod}}</td>
+            </tr>
+            <tr>
+                <td>Revision</td><td>{{ publication.revision}}</td>
+            </tr>
+            <tr>
+                <td>Created</td><td>{{ publication.created}}</td>
+            </tr>
+            <tr>
+                <td>Depositor</td><td>{{ publication.depositor}}</td>
+            </tr>
+        </table>
+
+        <br/>
+        <h2>depositors</h2>
+        <h2>enddepositors</h2>
+
+    {% else %}
+        <p>No details are available for publication {{ publication_id }}.</p>
+    {% endif %}
+
+{% endblock %}
+

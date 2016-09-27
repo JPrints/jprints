@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %} Publications {% endblock %}
+
+{% block body_block %}
+    {% if latest_publication_list %}
+        <ul>
+        {% for publication in latest_publication_list %}
+            <li><a href="{% url 'publication:detail' publication.id %}">{{ publication.title }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No publications are available.</p>
+    {% endif %}
+
+{% endblock %}
+

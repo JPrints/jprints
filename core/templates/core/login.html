@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %} JPrints User Login {% endblock %}
+
+{% block body_block %}
+
+    <h2>Login to JPrints</h2>
+    <form id="login_form" method="post" action="/jprints/login/">
+        {% csrf_token %}
+        Username: <input type="text" name="username" value="" size="50" />
+        <br />
+        Password: <input type="password" name="password" value="" size="50" />
+        <br />
+        <input type="submit" name="submit" />
+    </form>
+
+{% endblock %}
+
