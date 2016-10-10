@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
+from django.views import generic
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from core.forms import UserForm, PersonForm
+from .models import Person
 
 # Create your views here.
 
@@ -78,5 +81,14 @@ def profile(request):
         context = { 'user': request.user }
     return render(request, 'core/profile.html', context)
 
+def profiles(request):
+    users = User.objects.order_by('last_name')
+    context = { 'user_list': users }
+    return render(request, 'core/profiles.html', context)
+
+
+class DetailView(generic.DetailView):
+    model = Person
+    template_name = 'core/detail.html'
 
 

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %} Profiles {% endblock %}
+
+{% block body_block %}
+    {% if user_list %}
+        <ul>
+        {% for user in user_list %}
+           {% if user.person.id %}
+              <li>
+                <a href="{% url 'core:detail' user.person.id %}">
+                  <img width="20px" height="20px" src="{{ MEDIA_URL }}{{ user.person.photo.name }}" alt="photo" /> {{ user.person.id }} {{ user.first_name }} {{ user.last_name }}
+                </a>
+              </li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No profiles are available.</p>
+    {% endif %}
+
+{% endblock %}
+

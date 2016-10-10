@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %} Profile Details {% endblock %}
+
+{% block body_block %}
+    {% if person %}
+        <table>
+            <tr>
+                <td><img width="100px" height="106px" src="{{ MEDIA_URL }}{{ person.photo.name }}" alt="photo" /></td>
+                <td></td>
+            </tr>
+ 
+            <tr>
+                <td>id</td><td>{{ person.id}}</td>
+            </tr>
+ 
+            <tr>
+                <td>Username</td><td>{{ person.user.username}}</td>
+            </tr>
+            <tr>
+                <td>Name</td><td>{{ person.user.first_name}} {{person.user.last_name}}</td>
+            </tr>
+            <tr>
+                <td>EMail</td><td>{{ person.user.email}}</td>
+            </tr>
+            <tr>
+                <td>orcid</td><td>{{ person.orcid}}</td>
+            </tr>
+            <tr>
+                <td>User Type</td><td>{{ person.user_type}}</td>
+            </tr>
+            <tr>
+                <td>Language</td><td>{{ person.lang}}</td>
+            </tr>
+
+        </table>
+
+
+    {% else %}
+        <p>No details are available for profile {{ person.id }}.</p>
+    {% endif %}
+
+{% endblock %}
+
