@@ -9,7 +9,7 @@
     {% if user %}
         <table>
             <tr>
-                <td><img width="100px" height="106px" src="{{ MEDIA_URL }}/profile/{{ user.id }}/photo/userphoto.jpg" alt="photo" /></td>
+                <td><img width="100px" height="106px" src="{{ MEDIA_URL }}{{ user.person.photo.name }}" alt="photo" /></td>
                 <td></td>
             </tr>
  
