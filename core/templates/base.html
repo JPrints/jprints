@@ -33,25 +33,25 @@
       <a class="navbar-brand" href="#">JPrints</a> 
 	<div id="navbar">
         <nav class="nav navbar-nav pull-xs-left">
-          <a class="nav-item nav-link" href="{% url 'index' %}">Home</a>
-                    <a class="nav-item nav-link" href="{% url 'about' %}">About</a>
-                    <a class="nav-item nav-link" href="{% url 'publication:index' %}">Publications</a>
-                    {% if user.is_authenticated %}
-                        <a class="nav-item nav-link"
+            <a class="nav-item nav-link" href="{% url 'index' %}">Home</a>
+            <a class="nav-item nav-link" href="{% url 'publication:index' %}">Publications</a>
+            {% if user.is_authenticated %}
+                <a class="nav-item nav-link"
                             href="{% url 'publication:add_publication' %}">New Publication</a>
-                        <a class="nav-item nav-link"
+                <a class="nav-item nav-link" 
+                            href="{% url 'core:profile' %}">Profile</a>
+                <a class="nav-item nav-link"
                             href="{% url 'core:logout' %}?next=/jprints/">Logout</a>
-                    {% else %}
-                        <a class="nav-item nav-link"
-                            href="{% url 'core:register' %}">Register Here</a>
-                        <a class="nav-item nav-link"
+            {% else %}
+                <a class="nav-item nav-link"
+                          href="{% url 'core:register' %}">Register Here</a>
+                <a class="nav-item nav-link"
                             href="{% url 'core:login' %}">Login</a>
-                    {% endif %}
+            {% endif %}
  
-          <a class="nav-item nav-link" href="#">Dashboard</a>
-          <a class="nav-item nav-link" href="#">Settings</a>
-          <a class="nav-item nav-link" href="#">Profile</a>
-          <a class="nav-item nav-link" href="#">Help</a>
+            <a class="nav-item nav-link" href="{% url 'about' %}">About</a>
+            <a class="nav-item nav-link" href="/admin" target="_new">Admin</a>
+            <a class="nav-item nav-link" href="#">Help</a>
         </nav>
         <form class="pull-xs-right">
           <input type="text" class="form-control" placeholder="Search...">

@@ -14,6 +14,7 @@ class Role(models.Model):
     def __str__(self):
         return '%s %s' % (self.id, self.name)
 
+
 class Person(models.Model):
 
     USER_TYPES = (
@@ -30,8 +31,11 @@ class Person(models.Model):
         ( 'IT', 'Italiano' ),
     )
 
+    def profile_photo_path(instance, filename):
+        return 'profile/{0}/photo/{1}'.format(instance.user.id, filename)
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    photo = models.ImageField(upload_to='profile_images', blank=True)
+    photo = models.ImageField(upload_to=profile_photo_path, blank=True)
     disp_title = models.CharField(max_length=20, blank=True)
     disp_given = models.CharField(max_length=50, blank=True)
     disp_family = models.CharField(max_length=50, blank=True)
@@ -45,6 +49,8 @@ class Person(models.Model):
     permissions = models.ManyToManyField(Permission, blank=True)
 
     lastmod = models.DateTimeField(auto_now=True)
+
+
 
     def __str__(self):
         return '%s %s' % (self.id, self.user)

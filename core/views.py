@@ -71,5 +71,12 @@ def user_logout(request):
     logout(request)
     return HttpResponseRedirect(reverse('index'))
 
+@login_required
+def profile(request):
+    context = {}
+    if request.user.is_authenticated():
+        context = { 'user': request.user }
+    return render(request, 'core/profile.html', context)
+
 
 

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %} JPrints Profile {% endblock %}
+
+{% block body_block %}
+
+    <h1>JPrints Profile</h1>
+    {% if user %}
+        <table>
+            <tr>
+                <td><img width="100px" height="106px" src="{{ MEDIA_URL }}/profile/{{ user.id }}/photo/userphoto.jpg" alt="photo" /></td>
+                <td></td>
+            </tr>
+ 
+            <tr>
+                <td>id</td><td>{{ user.id}}</td>
+            </tr>
+ 
+            <tr>
+                <td>Username</td><td>{{ user.username}}</td>
+            </tr>
+            <tr>
+                <td>Name</td><td>{{ user.first_name}} {{user.last_name}}</td>
+            </tr>
+            <tr>
+                <td>EMail</td><td>{{ user.email}}</td>
+            </tr>
+            <tr>
+                <td>orcid</td><td>{{ user.person.orcid}}</td>
+            </tr>
+            <tr>
+                <td>User Type</td><td>{{ user.person.user_type}}</td>
+            </tr>
+            <tr>
+                <td>Language</td><td>{{ user.person.lang}}</td>
+            </tr>
+
+        </table>
+
+    {% endif %}
+
+{% endblock %}
+
