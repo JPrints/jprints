@@ -10,13 +10,14 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>Dashboard Template for Bootstrap</title>
+    <title>JPrints</title>
 
     <!-- Bootstrap core CSS -->
     <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
-
     <!-- Custom styles for this template -->
     <link href="{% static "bootstrap/css/dashboard.css" %}" rel="stylesheet">
+    <!-- Custom styles for JPrints -->
+    <link href="{% static "jprints.css" %}" rel="stylesheet">
   </head>
 
   <body>
@@ -50,12 +51,14 @@
                             href="{% url 'core:login' %}">Login</a>
             {% endif %}
  
+            <a class="nav-item nav-link" href="{% url 'core:search' %}">Search</a>
             <a class="nav-item nav-link" href="{% url 'about' %}">About</a>
             <a class="nav-item nav-link" href="/admin" target="_new">Admin</a>
             <a class="nav-item nav-link" href="#">Help</a>
         </nav>
-        <form class="pull-xs-right">
-          <input type="text" class="form-control" placeholder="Search...">
+        <form class="pull-xs-right" method="post" action="/jprints/search/">
+            {% csrf_token %}
+          <input type="text" class="form-control" placeholder="Search..." name="query" id="query">
         </form>
       </div>
     </nav>

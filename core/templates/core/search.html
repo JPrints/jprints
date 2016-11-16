@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %} Search {% endblock %}
+
+{% block body_block %}
+    <div> 
+    {% if result_list %}
+        <h3>Search Results for query: "{{query}}"</h3>
+        <div class="list-group">
+        {% for result in result_list %}
+            <div class="list-group-item">
+                <h4 class="list-group-item-heading">
+                {% if result.type == "publication" %}
+                    <a href="{% url 'publication:detail' result.id %}">{{ result.citation }}</a>
+                {% elif result.type == "person" %}
+                    <a href="{% url 'core:detail' result.id %}">{{ result.citation }}</a>
+                {% endif %}
+                </h4>
+                {% autoescape off %}
+                {% if result.highlight_t %}
+                   <p class="list-group-item-text">Found in title: {{ result.highlight_t }}</p>
+                {% endif %}
+                {% if result.highlight_a %}
+                   <p class="list-group-item-text">Found in abstract: {{ result.highlight_a }}</p>
+                {% endif %}
+                {% if result.highlight_ft %}
+                   <p class="list-group-item-text">Found in text: {{ result.highlight_ft }}</p>
+                {% endif %}
+                {% if result.highlight_f %}
+                   <p class="list-group-item-text">Found in family name: {{ result.highlight_f }}</p>
+                {% endif %}
+                {% if result.highlight_g %}
+                   <p class="list-group-item-text">Found in given name: {{ result.highlight_g }}</p>
+                {% endif %}
+
+                {% endautoescape %}
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <h3>No search results returned</h3>
+    {% endif %}
+    </div>
+{% endblock %}
+

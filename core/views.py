@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from core.forms import UserForm, PersonForm
+from core.elastic_search import run_query
 from .models import Person
 
 # Create your views here.
@@ -85,6 +86,17 @@ def profiles(request):
     users = User.objects.order_by('last_name')
     context = { 'user_list': users }
     return render(request, 'core/profiles.html', context)
+
+
+def search(request):
+    result_list = []
+
+    if request.method == 'POST':
+        query = request.POST['query'].strip()
+        if query:
+            result_list = run_query(query)
+            #print("views.search::result_list: ["+'\n'.join(map(str, result_list))+"]")
+    return render(request, 'core/search.html', {'result_list': result_list, 'query': query } )
 
 
 class DetailView(generic.DetailView):

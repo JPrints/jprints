@@ -5,7 +5,10 @@ from django.views import generic
 from django.contrib.auth.decorators import login_required
 
 from .models import Publication
-from publications.forms import PublicationForm
+#from publications.forms import PublicationFormAdmin
+from publications.forms import PublicationFormAdmin, PublicationFormDepositor
+
+import logging
 
 
 def index(request):
@@ -20,16 +23,34 @@ def mydetail(request, pk):
 
 @login_required
 def add_publication(request):
-    form = PublicationForm()
+
+    logger = logging.getLogger('jprints')
+    person = request.user.person
+    form = PublicationFormDepositor( person )
+
+    if (person.user_type == "Ad"):
+        form = PublicationFormAdmin()
+        logger.info("Person is admin")
+    else:
+        #form = PublicationFormAdmin(request.POST)
+        form = PublicationFormDepositor( person )
+        logger.info("Person is NOT admin")
 
     if request.method == 'POST':
-        form = PublicationForm(request.POST)
-
+        logger.info("request is POST")
         if form.is_valid():
             new_pub = form.save(commit=True)
             return mydetail(request, new_pub.id)
         else:
             print(form.errors)
+    else:
+        logger.info(__name__+": request is NOT POST")
+
+#        if (person.user_type == "Ad"):
+#            form = PublicationFormAdmin( person )
+#            form.fields['depositor'].initial = person.id
+#        else:
+#            form = PublicationFormDepositor( person )
 
     return render(request, 'publications/add_publication.html', {'form': form})
 
