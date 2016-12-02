@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %} JPrints Edit User {% endblock %}
+
+{% block body_block %}
+
+    <h1>Edit JPrints User Profile Data</h1>
+
+        <table>
+            <tr><th>Name:</th><td>{{user.first_name}} {{user.last_name}}</td>
+            <tr><th>Username:</th><td>{{user.username}}</td>
+            <tr><th>Email:</th><td>{{user.email}}</td>
+        </table>
+        <form id="user_form" method="post" action="/jprints/edit/{{user.person.id}}/"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <table>
+                {{ person_form.as_table }}
+            </table>
+            <input type="submit" name="submit" value="Save" />
+        </form>
+
+{% endblock %}
+

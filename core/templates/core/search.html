@@ -10,13 +10,18 @@
         <div class="list-group">
         {% for result in result_list %}
             <div class="list-group-item">
+            {% if result.type == "publication" %}
                 <h4 class="list-group-item-heading">
-                {% if result.type == "publication" %}
-                    <a href="{% url 'publication:detail' result.id %}">{{ result.citation }}</a>
-                {% elif result.type == "person" %}
-                    <a href="{% url 'core:detail' result.id %}">{{ result.citation }}</a>
+                <a href="{% url 'publication:detail' result.id %}">
+                    <img width="20px" height="20px" src="{% static 'images/' %}{{ result.obj.get_icon_name }}" alt="icon" /> {{ result.obj.get_search_citation }}</a>
+                </h4> 
+            {% elif result.type == "person" %}
+                <h4>
+                    <a href="{% url 'core:detail' result.id %}">
+                       <img width="20px" height="20px" src="{{ MEDIA_URL }}{{ result.obj.photo.name }}" alt="photo" /> {{ result.obj.get_search_citation }}
+                    </a>
+                </h4> ({{result.obj.orcid}})
                 {% endif %}
-                </h4>
                 {% autoescape off %}
                 {% if result.highlight_t %}
                    <p class="list-group-item-text">Found in title: {{ result.highlight_t }}</p>

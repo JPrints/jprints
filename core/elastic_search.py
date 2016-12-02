@@ -20,15 +20,7 @@ def run_query( query ):
     results = []
     es = Elasticsearch()
     
-    print("elastic_search::run_query term: ["+query+"]")
     #res = es.search(index='jprints', body={"query": {"match_all": { }}})
-    #res = es.search(index='jprints', body={"query": 
-    #                {   "bool": {"must" :{ "query_string" :{ "query": query } } }},
-    #                    "highlight":{"fields":{ "title" : {} }} 
-    #                } )
-    #"matched_fields" : [ "depositor", "status", "type", "pub_status", "title", "abstract", "subject", "division" ],
-    #"type": "fvh"
-    # "order": "score",
     res = es.search(index='jprints', 
                      body={ 
                             "query": { 
@@ -54,18 +46,13 @@ def run_query( query ):
     print("Got %d Hits:" % res['hits']['total'])
 
     for hit in res['hits']['hits']:
-        #print("time: %(timestamp)s, depositor: %(depositor)s, title: %(title)s, abs: %(abstract)s" % hit["_source"])
-        #print("HIGHLIGHT: abs: %(abstract)s, title: %(title)s" % hit["highlight"])
         hit_type = hit["_type"]
         source = hit["_source"]
         hit_id = hit["_id"]
-        citation = "" 
         if (hit_type == "person"):
             obj = Person.objects.get(pk=hit_id)
-            citation = obj.get_search_citation()
         elif (hit_type == "publication"):
             obj = Publication.objects.get(pk=hit_id)
-            citation = obj.get_search_citation()
 
         highlight_title = ""
         highlight_abs = ""
@@ -86,9 +73,6 @@ def run_query( query ):
             elif key == "given":
                 highlight_given = value
 
-        print("highlight_title:", highlight_title, "highlight_abs:", highlight_abs, "family", highlight_family, "given", highlight_given)
-
-        #print("\n\n\ntime: " + source["timestamp"]+ "\n\n\n")
         results.append({
                     'highlight_t': highlight_title,
                     'highlight_a': highlight_abs,
@@ -97,13 +81,8 @@ def run_query( query ):
                     'highlight_g': highlight_given,
                     'id': hit_id,
                     'type': hit_type,
-                    'citation': citation,
+                    'obj': obj,
                     })
-    #   print("index: "+ hit )
-    #   print("index: "+ hit['_index'] )
-    #   print("type: "+ hit{'_type'} )
-    #   source =  hit{'_source'}
-    #   print("depositor: "+ source[{'depositor'} )
 
     #print("elastic_search::run_query results: ["+'\n'.join(map(str, results))+"]")
     return results

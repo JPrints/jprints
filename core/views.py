@@ -82,6 +82,36 @@ def profile(request):
         context = { 'user': request.user }
     return render(request, 'core/profile.html', context)
 
+@login_required
+def edit_profile(request, profileid):
+
+    if request.method == 'POST':
+        print("edit_profile called, POST param is", profileid) 
+        person_orig = Person.objects.get(pk=profileid)
+        print("edit_profile person is", person_orig) 
+
+        person_form = PersonForm(data=request.POST, instance=person_orig)
+
+        if person_form.is_valid():
+            person = person_form.save()
+            if 'photo' in request.FILES:
+                person.photo = request.FILES['photo']
+            person.save()
+            context = { 'user': person.user }
+            return render(request, 'core/profile.html', context)
+        else:
+            print(person_form.errors)
+            context = { 'user': person.user, 'person_form': person_form }
+            return render(request, 'core/edit.html', context)
+
+    else: 
+        person = Person.objects.get(pk=profileid)
+        print("edit_profile called, GET param is", profileid) 
+        person_form = PersonForm(instance=person)
+        context = { 'user': person.user, 'person_form': person_form }
+        return render(request, 'core/edit.html', context)
+
+
 def profiles(request):
     users = User.objects.order_by('last_name')
     context = { 'user_list': users }

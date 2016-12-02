@@ -100,6 +100,19 @@ class Publication(models.Model):
         citation = self.title+" ["+self.get_publication_type_str()+"] "+self.abstract
         return citation
 
+    def get_icon_name(self):
+        icon_name = "research_books.png"
+        if ( self.publication_type == "A" ):
+            icon_name = "doc_file.png"
+        elif ( self.publication_type == "B" ):
+            icon_name = "research_books.png"
+        elif ( self.publication_type == "S" ):
+            icon_name = "research_books.png"
+
+        return icon_name
+
+
+
 
     def __str__(self):
         return '%s %s' % (self.id, self.title)

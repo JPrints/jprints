@@ -4,10 +4,11 @@
 {% block title %} Publications {% endblock %}
 
 {% block body_block %}
+    <h2>Publications</h2>
     {% if latest_publication_list %}
         <ul>
         {% for publication in latest_publication_list %}
-            <li><a href="{% url 'publication:detail' publication.id %}">{{ publication.title }}</a></li>
+            <li><a href="{% url 'publication:detail' publication.id %}"><img width="20px" height="20px" src="{% static 'images/' %}{{ publication.get_icon_name }}" alt="photo" /> {{ publication.title }}</a></li>
         {% endfor %}
         </ul>
     {% else %}

@@ -14,7 +14,10 @@
             </tr>
  
             <tr>
-                <td>id</td><td>{{ user.id}}</td>
+                <td>user id</td><td>{{ user.id}}</td>
+            </tr>
+             <tr>
+                <td>person id</td><td>{{ user.person.id}}</td>
             </tr>
  
             <tr>
@@ -27,6 +30,10 @@
                 <td>EMail</td><td>{{ user.email}}</td>
             </tr>
             <tr>
+                <td>Profile Name</td><td>{{user.person.disp_title}} {{ user.person.disp_given}} {{user.person.disp_family}}</td>
+            </tr>
+
+            <tr>
                 <td>orcid</td><td>{{ user.person.orcid}}</td>
             </tr>
             <tr>
@@ -35,6 +42,18 @@
             <tr>
                 <td>Language</td><td>{{ user.person.lang}}</td>
             </tr>
+            <tr>
+                <td></td><td></td>
+                <td></td><td>
+                        <form id="user_edit_form" method="get" action="/jprints/edit/{{user.person.id}}/">
+                        {% csrf_token %}
+                    <input type="submit" name="submit" value="Edit" />
+                </form>
+
+                
+                </td>
+            </tr>
+
 
         </table>
 

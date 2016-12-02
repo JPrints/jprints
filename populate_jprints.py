@@ -1,9 +1,11 @@
 import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jprints.settings')
+import shutil
 
 import django
 django.setup()
 
+from django.conf import settings
 from elasticsearch import Elasticsearch
 from core.elastic_search import initialise_elastic_search
 from django.contrib.auth.models import User
@@ -134,13 +136,14 @@ def populate_people():
          "dept": "dept 1",
          "org": "org 1",
          "addr": "here and there",
+         "photo": "default_male_128.png",
          },
          {"username": "test2",
          "email": "test@test2.com",
          "first": "Test",
          "last": "Two",
          "staff": "No",
-         "disp_title": "Mr",
+         "disp_title": "Mrs",
          "disp_given": "Test",
          "disp_family": "Two",
          "lang": "DE",
@@ -149,13 +152,14 @@ def populate_people():
          "dept": "dept 1",
          "org": "org 1",
          "addr": "here and there",
+         "photo": "default_female_128.png",
          },
          {"username": "test3",
          "email": "test@test3.com",
          "first": "Test",
          "last": "Three",
          "staff": "No",
-         "disp_title": "Mr",
+         "disp_title": "Miss",
          "disp_given": "dispgiven",
          "disp_family": "",
          "lang": "DE",
@@ -164,6 +168,7 @@ def populate_people():
          "dept": "dept 1",
          "org": "org 1",
          "addr": "here and there",
+         "photo": "default_female_128.png",
          },
     ]
 
@@ -183,7 +188,19 @@ def add_user(user):
     p.dept = user["dept"]
     p.org = user["org"]
     p.addr = user["addr"]
+
     p.save()
+    if ( "photo" in user ):
+        src_path = settings.STATIC_DIR + "/images/"+user["photo"]
+        photo_path = "/profile/"+str(p.id)+"/photo/"
+        photo_name = "userphoto.png"
+        dest_path = settings.MEDIA_DIR + photo_path
+        os.makedirs(dest_path)
+        shutil.copy(src_path, dest_path+photo_name)
+        print("User photo", "src", src_path, "dest", dest_path)
+        p.photo.name = photo_path+photo_name
+
+        p.save()
 
 
 def clear_database():
