@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %} JPrints Edit publication {% endblock %}
+
+{% block body_block %}
+
+    <h1>Edit Publication Data</h1>
+
+        <table>
+            <tr><th>Id:</th><td>{{pub.id}}</td>
+            <tr><th>Title:</th><td>{{pub.title}}</td>
+        </table>
+        <form id="pub_form" method="post" action="/pub/edit/{{pub.id}}/"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <table>
+                {{ pub_form.as_table }}
+            </table>
+            <input type="submit" name="submit" value="Save" />
+        </form>
+            <table>
+            <tr>
+                <td>
+                    <form id="pub_add_doc_form" method="get" action="/pub/add_doc/{{pub.id}}/">
+                        {% csrf_token %}
+                        <input type="submit" name="submit" value="Add a document" />
+                    </form>
+                </td>
+                <td>
+                    <form id="pub_add_contrib_form" method="get" action="/pub/add_contrib/{{pub.id}}/">
+                        {% csrf_token %}
+                        <input type="submit" name="submit" value="Add a contributor" />
+                    </form>
+                </td>
+            </tr>
+        </table>
+ 
+{% endblock %}
+

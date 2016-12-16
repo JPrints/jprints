@@ -15,7 +15,7 @@ def initialise_elastic_search():
     print("done created elastic search index", cres)
 
 def run_query( query ):
-    from publications.models import Publication
+    from publications.models import Publication, Document
     from core.models import Person
     results = []
     es = Elasticsearch()
@@ -29,7 +29,10 @@ def run_query( query ):
                                         { "match": { "family": query } },
                                         { "match": { "given": query } },
                                         { "match": { "title": query } },
-                                        { "match": { "abstract": query } }
+                                        { "match": { "abstract": query } },
+                                        { "match": { "body": query } },
+                                        { "match": { "filename": query } },
+                                        { "match": { "filedesc": query } }
                                     ]
                                 } 
                             },
@@ -38,7 +41,10 @@ def run_query( query ):
                                     "family": {}, 
                                     "given": {}, 
                                     "title": {}, 
-                                    "abstract": {}
+                                    "abstract": {},
+                                    "body": {},
+                                    "filename": {},
+                                    "filedesc": {},
                                 }
                             }
                         }   
@@ -53,15 +59,20 @@ def run_query( query ):
             obj = Person.objects.get(pk=hit_id)
         elif (hit_type == "publication"):
             obj = Publication.objects.get(pk=hit_id)
+        elif (hit_type == "fulltext"):
+            obj = Document.objects.get(pk=hit_id)
 
         highlight_title = ""
         highlight_abs = ""
         highlight_text = ""
         highlight_family = ""
         highlight_given = ""
+        highlight_body = ""
+        highlight_filename = ""
+        highlight_filedesc = ""
         highlight = hit["highlight"]
         for key,value in highlight.items():
-            #print("highlight key:", key, "val:", value)
+            print("highlight key:", key, "val:", value)
             if key == "title":
                 highlight_title = value
             elif key == "abstract":
@@ -72,6 +83,12 @@ def run_query( query ):
                 highlight_family = value
             elif key == "given":
                 highlight_given = value
+            elif key == "body":
+                highlight_body = value
+            elif key == "filename":
+                highlight_filename = value
+            elif key == "filedesc":
+                highlight_filedesc = value
 
         results.append({
                     'highlight_t': highlight_title,
@@ -79,6 +96,9 @@ def run_query( query ):
                     'highlight_ft': highlight_text,
                     'highlight_f': highlight_family,
                     'highlight_g': highlight_given,
+                    'highlight_b': highlight_body,
+                    'highlight_fn': highlight_filename,
+                    'highlight_fd': highlight_filedesc,
                     'id': hit_id,
                     'type': hit_type,
                     'obj': obj,
@@ -109,9 +129,10 @@ def index_person( person ):
  
 
 def index_publication( publication ):
+    from publications.models import Publication, Document
     es = Elasticsearch()
-    #str = "index_publication [%s] [%s] called" % ( publication.id, publication.title )
-    #print (str)
+    my_str = "index_publication [%s] [%s] called" % ( publication.id, publication.title )
+    print (my_str)
     doc = {
        'id'         : publication.id,
        'depositor'  : publication.depositor.id,
@@ -124,5 +145,24 @@ def index_publication( publication ):
        'timestamp'  : datetime.now(),
     }
     res = es.index( index='jprints', doc_type="publication", id=publication.id, body=doc ) 
-    #print("index created:", res['created'])
+
+    print("index DOCS !!!!!!!!!!!!!!!!! for publication [", publication.id, "]")
+    documents = Document.objects.filter(publication__id=publication.id)
+    for fulltext in documents:
+        the_text =  "A full text for Article 2 edited"
+        index_id = str(publication.id) 
+        index_id += "_"
+        index_id += str(fulltext.id) 
+        print("index id[",index_id,"] doc[", fulltext.id, "] name[", fulltext.filefield.name, "]")
+        doc = {
+            #'id'        : index_id,
+            'id'        : 1000*publication.id,
+            'body'      : the_text,
+            'filename'  : fulltext.filefield.name,
+            'filedesc'  : fulltext.description,
+            'timestamp' : datetime.now(),
+        }
+    res = es.index( index='jprints', doc_type="fulltext", id=fulltext.id, body=doc ) 
+
+
 

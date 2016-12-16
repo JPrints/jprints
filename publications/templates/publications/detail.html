@@ -48,11 +48,37 @@
             <tr>
                 <td>Depositor</td><td>{{ publication.depositor}}</td>
             </tr>
+            <tr>
+                <td></td><td></td>
+                <td></td><td>
+                        <form id="pub_edit_form" method="get" action="/pub/edit/{{publication.id}}/">
+                        {% csrf_token %}
+                    <input type="submit" name="submit" value="Edit" />
+                </form>
+
+
         </table>
 
         <br/>
-        <h2>depositors</h2>
-        <h2>enddepositors</h2>
+        {% if documents.exists %}
+            <h2>Documents</h2>
+            <ul>
+            {% for d in documents %}
+                {% if d.visibility_status == 'P' %}
+                    {% if d.filefield %}
+                        <li><a href="{{ MEDIA_URL }}{{ d.filefield.name }}">{{ d.doc_type }} {{ d.filefield.name }} {{ d.description }} {{ d.visibility_status }}</a></li>
+                    {% else %}
+                        <li>{{ d.doc_type }} {{ d.filefield }} {{ d.description }} (No text available)</li>
+                    {% endif %}
+
+                {% else %}
+                     <li>{{ d.doc_type }} {{ d.filefield }} {{ d.description }} (RESTRICTED)</li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No documents are available for this publication.</p>
+        {% endif %}
 
     {% else %}
         <p>No details are available for publication {{ publication_id }}.</p>

@@ -34,6 +34,38 @@ PUBLICATION_TYPES = (
         ( 'S', 'Book Section' ),
     )
 
+DOCUMENT_TYPES = (
+        ( 'dra', 'draft' ),
+        ( 'sub', 'submitted' ),
+        ( 'acc', 'accepted' ),
+        ( 'pub', 'published' ),
+        ( 'upd', 'updated' ),
+        ( 'sup', 'supplemental' ),
+        ( 'cov', 'coverimage' ),
+        ( 'dat', 'dataset' ),
+        ( 'pre', 'presentation' ),
+        ( 'oth', 'other' ),
+    )
+
+LICENCES = (
+        ( 'publi', 'publisher' ),
+        ( 'cc_by', 'cc_by' ),
+        ( 'by_nc', 'cc_by_nc' ),
+        ( 'by_nd', 'cc_by_nd' ),
+        ( 'nc_nd', 'cc_by_nc_nd' ),
+        ( 'nc_sa', 'cc_by_nc_sa' ),
+        ( 'by_sa', 'cc_by_sa' ),
+        ( 'cc_pd', 'cc_public_domain' ),
+    )
+
+VISIBILITY_STATES = (
+        ( 'P', 'Public' ),
+        ( 'R', 'Restricted' ),
+        ( 'E', 'Embagoed' ),
+        ( 'N', 'None' ),
+    )
+
+
 
 class Publication(models.Model):
     from core.models import Person
@@ -73,7 +105,6 @@ class Publication(models.Model):
     subject = models.CharField(max_length=200, blank=True)
     divisions = models.CharField(max_length=200, blank=True)
     
-
     revision = models.IntegerField(default=1, editable=False)
     created = models.DateTimeField(auto_now_add=True, )
     #created = models.DateTimeField(auto_now_add=True, default=timezone.now(), editable=False)
@@ -86,7 +117,7 @@ class Publication(models.Model):
     def save(self, *args, **kwargs):
         super(Publication, self).save(*args, **kwargs) 
         index_publication( self )
-        #print("Publication.save called index !!!!!", self.id, self.title)
+        print("Publication.save called index !!!!!", self.id, self.title)
 
     def get_publication_type_str(self):
         type = ""
@@ -116,5 +147,22 @@ class Publication(models.Model):
 
     def __str__(self):
         return '%s %s' % (self.id, self.title)
+
+class Document(models.Model):
+
+    def pub_doc_path(instance, filename):
+        return 'pub/{0}/doc/{1}/{2}'.format(instance.publication.id, instance.id, filename)
+
+    publication = models.ForeignKey('Publication', on_delete=models.CASCADE)
+
+    doc_type = models.CharField(max_length=3, choices=DOCUMENT_TYPES, default='dra')
+    visibility_status = models.CharField(max_length=1, choices=VISIBILITY_STATES, default='N')
+    licence = models.CharField(max_length=5, choices=LICENCES, blank=True) 
+    embargo = models.DateField(blank=True, null=True)
+    description = models.TextField(blank=True, )
+    filefield = models.FileField(upload_to=pub_doc_path, blank=True)
+
+
+
 
 
