@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^profiles/$', views.profiles, name='profiles'),
     url(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name='detail'),
     url(r'^search/$', views.search, name='search'),
+    url(r'^filter/(?P<ftype>[\w]+)/(?P<ffield>[\w]+)/$', views.filter, name='filter'),
 ]

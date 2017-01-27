@@ -7,7 +7,7 @@ django.setup()
 
 from django.conf import settings
 from elasticsearch import Elasticsearch
-from core.elastic_search import initialise_elastic_search
+from core.elastic_search import initialise_elastic_search, run_publication_filter, run_agg_filter
 from django.contrib.auth.models import User
 from core.models import Person, Role, Permission
 from publications.models import Publication
@@ -25,6 +25,7 @@ def populate_publications():
          "abstract": "An abstract for Article 1",
          "subject": "1",
          "divisions": "1",
+         "publication_date": "2017-01-02",
          },
          {
          "depositor": "admin",
@@ -36,6 +37,7 @@ def populate_publications():
          "abstract": "An abstract for Article 2",
          "subject": "1",
          "divisions": "1",
+         "publication_date": "2017-01-02",
          },
          {
          "depositor": "admin",
@@ -47,6 +49,7 @@ def populate_publications():
          "abstract": "An abstract for Article 3",
          "subject": "1",
          "divisions": "1",
+         "publication_date": "2016-01-02",
          },
          {
          "depositor": "test1",
@@ -58,6 +61,7 @@ def populate_publications():
          "abstract": "An abstract for Book Section One, note that One is also a family name",
          "subject": "1",
          "divisions": "1",
+         "publication_date": "2015-01-02",
          },
          {
          "depositor": "test2",
@@ -69,6 +73,7 @@ def populate_publications():
          "abstract": "An abstract for Book Section 2",
          "subject": "1",
          "divisions": "1",
+         "publication_date": "2015-01-02",
          },
          {
          "depositor": "test3",
@@ -80,6 +85,7 @@ def populate_publications():
          "abstract": "An abstract for Book 1",
          "subject": "1",
          "divisions": "1",
+         "publication_date": "2015-01-02",
          },
    
    ]
@@ -89,6 +95,7 @@ def populate_publications():
 
 def add_publication(pub):
     print("add publication: depositor {0} type {1} title {2}".format(str(pub["depositor"]), str(pub["publication_type"]), str(pub["title"])))
+    print("add publication: date", str(pub["publication_date"]) )
     u = User.objects.get_or_create(username=pub["depositor"])[0]
     person = Person.objects.get_or_create(user=u)[0]
     #print("add_publication called person", person.id,  "user", u.id )
@@ -100,7 +107,13 @@ def add_publication(pub):
     p.abstract = pub["abstract"]
     p.subject = pub["subject"]
     p.divisions = pub["divisions"]
+    p.publication_date = pub["publication_date"]
+    #p.online_date = pub["online_date"]
+    #p.accept_date = pub["accept_date"]
+    #p.submit_date = pub["submit_date"]
+    #p.complete_date = pub["complete_date"]
     p.save()
+    print("added publication:", "id", p.id, "date", p.publication_date )
 
 
 def populate_people():
@@ -224,12 +237,17 @@ def clear_database():
 
 if __name__ == '__main__':
     print("clear database")
-    clear_database()
+    #clear_database()
 
     print("Setup Elastic Search indexes")
-    initialise_elastic_search()
+    #initialise_elastic_search()
 
     print("Start populate JPrints")
-    populate_people()
-    populate_publications()
+    #populate_people()
+    #populate_publications()
+
+    #run_publication_filter( "item_type", "A" )
+    #run_publication_filter( "item_type", "B" )
+    run_agg_filter(  )
+
     print("Finished JPrints population script")

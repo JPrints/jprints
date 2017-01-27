@@ -102,6 +102,13 @@ class Publication(models.Model):
     title = models.CharField(max_length=200, blank=True)
     abstract = models.TextField(blank=True)
 
+    #publication_date = models.DateField(null=True,auto_now=False,auto_now_add=False,blank=True)
+    publication_date = models.DateField(auto_now=False,auto_now_add=False,blank=True)
+    online_date = models.DateField(null=True,auto_now=False,auto_now_add=False,blank=True)
+    accept_date = models.DateField(null=True,auto_now=False,auto_now_add=False,blank=True)
+    submit_date = models.DateField(null=True,auto_now=False,auto_now_add=False,blank=True)
+    complete_date = models.DateField(null=True,auto_now=False,auto_now_add=False,blank=True)
+
     subject = models.CharField(max_length=200, blank=True)
     divisions = models.CharField(max_length=200, blank=True)
     

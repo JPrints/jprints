@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from core.forms import UserForm, PersonForm
-from core.elastic_search import run_query
+from core.elastic_search import run_query, run_filter
 from .models import Person
 
 # Create your views here.
@@ -127,6 +127,19 @@ def search(request):
             result_list = run_query(query)
             #print("views.search::result_list: ["+'\n'.join(map(str, result_list))+"]")
     return render(request, 'core/search.html', {'result_list': result_list, 'query': query } )
+
+def filter(request, ftype, ffield ):
+    result_list = []
+    print("views.filter ["+ftype+"]", ffield)
+
+    result_list = run_filter( ftype, ffield, "B" )
+    print("views.filter::result_list: ["+'\n'.join(map(str, result_list))+"]")
+    context = { 'result_list': result_list, 
+                'type': ftype,    #"Publications", 
+                'ffield': ffield 
+            }
+    return render(request, 'core/browse.html', context )
+
 
 
 class DetailView(generic.DetailView):

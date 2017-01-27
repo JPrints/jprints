@@ -7,4 +7,21 @@ em {
   color: red;
 }
 
+body {
+  min-height: 2000px;
+  padding-top: 90px;
+}
+
+.navbar-brand {
+  height: 80px;
+  /* width: 240px; */
+}
+
+.navbar-line2 {
+  clear: both;
+  margin-left: 70px;
+  top: 35px;
+  position: absolute;
+
+}
 
