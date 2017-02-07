@@ -1,5 +1,6 @@
 import json
 import urllib
+import re
 
 from datetime import datetime
 from elasticsearch import Elasticsearch
@@ -58,10 +59,51 @@ def initialise_elastic_search():
                         },
                         "milestone" : {
                             "type" : "date",
+                        }
+                    }
+                },
+                "person" : {
+                    "properties" : {
+                        "userid" : {
+                            "type" : "long"
+                        },
+                        "username" : {
+                            "type" : "keyword",
+                        },
+                        "given" : {
+                            "type" : "keyword",
+                        },
+                        "family" : {
+                            "type" : "keyword",
+                        },
+ 
+                        "d_given" : {
+                            "type" : "keyword",
+                        },
+                        "d_family" : {
+                            "type" : "keyword",
+                        },
+                        "orcid" : {
+                            "type" : "keyword",
+                        },
+                        "user_type" : {
+                            "type" : "keyword",
+                        },
+                        "dept" : {
+                            "type" : "keyword",
+                        },
+                        "org" : {
+                            "type" : "keyword",
+                        },
+                        "addr" : {
+                            "type" : "keyword",
+                        },
+                        "first_char" : {
+                            "type" : "keyword",
                         },
  
                     }
-                }
+                },
             }
         } )
 
@@ -73,15 +115,28 @@ def run_filter( ftype, ffield, fval ):
     from core.models import Person
     results = []
     es = Elasticsearch()
-    
-    dsl = json.dumps({ 'query' : { 'bool': { 
-                                    'filter': { 
-                                        'bool': { 
-                                            'must': [ 
-                                                { 'term' : { ffield : fval } }, 
-                                                { 'term' : { '_type': ftype } } 
-                                            ] } } } }, 
-                                'sort': { 'timestamp': { 'order': 'desc' } } })
+    print( "run_filter", ftype, ffield, fval )
+
+    fterm1 ={ '_type': ftype } 
+    term1 = { 'term' : fterm1 }
+    fterm2 ={ ffield : fval } 
+    term2 = { 'term' : fterm2 }
+    must = { 'must' : [ term1, term2 ] }
+    boolt = { 'bool': must }
+    filtert = { 'filter': boolt }
+    boolt2 = { 'bool': filtert }
+    dslraw = { 'query': boolt2} 
+
+    dsl = json.dumps( dslraw ) 
+
+#    dsl = json.dumps({ 'query' : { 'bool': { 
+#                                    'filter': { 
+#                                        'bool': { 
+#                                            'must': [ 
+#                                                { 'term' : { ffield : fval } }, 
+#                                                { 'term' : { '_type': ftype } } 
+#                                            ] } } } }, 
+#                                'sort': { 'timestamp': { 'order': 'desc' } } })
 
     print( "about to run dsl["+dsl+"]");
     res = es.search(index='jprints', body=dsl)
@@ -106,24 +161,75 @@ def run_filter( ftype, ffield, fval ):
                     'obj': obj,
                     })
 
-    print("elastic_search::run_publication_filter results: ["+'\n'.join(map(str, results))+"]")
+    print("elastic_search::run_filter results: ["+'\n'.join(map(str, results))+"]")
     return results
 
-def run_agg_filter( ):
+def run_agg_filter( ftype, filter_terms, milestone_terms ):
     from publications.models import Publication, Document
     from core.models import Person
-    results = []
+    results = {} 
     es = Elasticsearch()
-    
-    dsl = json.dumps({ 'query' : { 'bool': { 'filter': { 'term' : { 'item_type': 'A' } } } }, 'sort': { 'timestamp': { 'order': 'desc' } } })
-    print( "about to run dsl["+dsl+"]");
+ 
+    sort_term = {}
+    if ( ftype == "publication"):
+        sort_term = { 'milestone': { 'order': 'asc' }}
+    else:
+        sort_term = { 'family': { 'order': 'asc' }}
+    query = { 'bool': { 'filter': { 'term' : { '_type': ftype } } } }
+    sort = { 'timestamp': { 'order': 'desc' } }
+    aggs = {}
+    if ( ftype == "publication"):
+        aggs = {  
+            "item_type": { "terms": { "field": "item_type" } }, 
+            "pub_status": { "terms": { "field": "pub_status" } }, 
+            "status"    : { "terms": { "field": "status" } }, 
+            "milestone" : { "date_histogram": { "field" : "milestone", "interval" : "year", "format" : "yyyy"  } }, 
+        } 
+    elif ( ftype == "person"):
+        aggs = {  
+            "org" : { "terms": { "field": "org" } }, 
+            "dept": { "terms": { "field": "dept" } }, 
+            "user_type": { "terms": { "field": "user_type" } }, 
+            "family"   : { "terms": { "field": "family" } }, 
+            "first_char" : { "terms": { "field": "first_char" } }, 
+        } 
+
+    post_filter = { } 
+    terms = []
+    for pf in filter_terms:
+        this_term = { 'term' : pf }
+        terms.append(this_term)
+    for pf in milestone_terms:
+        this_term = { 'range' : pf }
+        terms.append(this_term)
+
+
+    # use a "should" term filter so that it is an "OR" rather than an "AND" that you would get with "must"
+    #bool_terms = { 'must' : terms }
+    bool_terms = { 'should' : terms }
+    post_filter = { 'bool':  bool_terms } 
+
+    query_from = 0
+    query_size = 10
+
+    dslraw = { 'from': query_from,
+               'size': query_size,
+               'sort': sort_term,
+               'query': query, 
+               'sort': sort, 
+               'aggs': aggs,
+               'post_filter': post_filter
+             } 
+
+    dsl = json.dumps( dslraw ) 
+
+    #print( "run_agg_filter about to run \n\ndsl["+dsl+"]", 'formed from\n\n', dslraw );
     res = es.search(index='jprints', body=dsl)
     
-    print("Got %d Hits:" % res['hits']['total'])
+    the_hits = []
+    #print("Got %d Hits:" % res['hits']['total'])
     for hit in res['hits']['hits']:
         hit_type = hit["_type"]
-        print( "got hit type:", str(hit_type) )
-        print( "got hit :", str(hit) )
         source = hit["_source"]
         hit_id = hit["_id"]
         if (hit_type == "person"):
@@ -133,18 +239,87 @@ def run_agg_filter( ):
         elif (hit_type == "fulltext"):
             obj = Document.objects.get(pk=hit_id)
 
-        results.append({
+        the_hits.append({
                     'id': hit_id,
                     'type': hit_type,
                     'obj': obj,
                     })
 
-    print("elastic_search::run_publication_filter results: ["+'\n'.join(map(str, results))+"]")
+    the_aggs = {}
+    for k,v in res['aggregations'].items():
+        this_agg = {}
+        for bucket in res['aggregations'][k]['buckets']:
+            key_name = bucket['key']
+            key_label = ""
+            key_count = 0
+            key_selected = 0
+            if 'key_as_string' in bucket:
+                key_label = bucket['key_as_string']
+            else:
+                key_label = get_bucket_key_str( k, bucket['key'] )
+
+            if 'doc_count' in bucket:
+                key_count = bucket['doc_count']
+            if is_key_selected( k, key_name, filter_terms, milestone_terms ):
+                key_selected = 1
+                print("found item")
+            elif is_key_selected( k, key_label, filter_terms, milestone_terms ):
+                key_selected = 1
+                print("found item")
+
+            this_agg[key_name] = {}
+            this_agg[key_name]['count'] = key_count
+            this_agg[key_name]['label'] = key_label
+            this_agg[key_name]['selected'] = key_selected
+
+        the_aggs[k] = this_agg
+        #print("the aggs", the_aggs)
+        
+    results = { 
+        'hits' : the_hits,
+        'aggs' : the_aggs
+    }
     return results
 
+def is_key_selected( term, key, selections, milestones ):
+    if term == "milestone":
+        year_match = re.match( "^\d\d\d\d$", str(key) )
+        if year_match:
+            for poss in milestones:
+                year_term = str(key)+"||/y"
+                if ( str(term) in poss ):
+                    if str(year_term) in str(poss[term]):
+                        return True
+    else:
+        for poss in selections:
+            if ( term in poss ):
+                if str(poss[term]) == str(key):
+                    return True
 
+    return False
 
-
+def get_bucket_key_str( term, key ):
+    from publications.models import Publication, Document
+    key_str = key
+    if ( term == "item_type" ):
+        key_str = Publication.get_choice_disp_str( Publication.PUBLICATION_TYPES, key)
+    elif ( term == "pub_status" ):
+        key_str = Publication.get_choice_disp_str( Publication.PUBLICATION_STATES, key)
+    elif ( term == "status" ):
+        key_str = Publication.get_choice_disp_str( Publication.STATUS_TYPES, key)
+    elif ( term == "milestone" ):
+        key_str = key
+    elif ( term == "org" ):
+        key_str = key
+    elif ( term == "dept" ):
+        key_str = key
+    elif ( term == "user_type" ):
+        key_str = key
+    elif ( term == "family" ):
+        key_str = key
+    elif ( term == "first_char" ):
+        key_str = key
+    return key_str
 
 def run_query( query ):
     from publications.models import Publication, Document
@@ -243,12 +418,21 @@ def run_query( query ):
 def index_person( person ):
     es = Elasticsearch()
     #print( "index_person [%s] called" % person.id)
+    family = ""
+    first_char = ""
+    if person.disp_family:
+        family = person.disp_family
+    elif person.user.last_name:
+        family = person.user.last_name
+    if len(family):
+        family = family.capitalize()
+        first_char = family[0]
+
     doc = {
        'userid'  : person.user.id,
        'username'     : person.user.username,
        'given'     : person.user.first_name,
        'family'     : person.user.last_name,
-       'd_title'     : person.disp_title,
        'd_given'     : person.disp_given,
        'd_family'     : person.disp_family,
        'orcid'     : person.orcid,
@@ -256,6 +440,7 @@ def index_person( person ):
        'dept'     : person.dept,
        'org'     : person.org,
        'addr'     : person.addr,
+       'first_char' : first_char,
     }
     res = es.index( index='jprints', doc_type="person", id=person.id, body=doc ) 
     #print(res['created'])

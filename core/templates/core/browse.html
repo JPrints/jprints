@@ -1,11 +1,89 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load staticfiles %}
 
 {% block title %} Search {% endblock %}
 
 {% block body_block %}
     <div> 
-    <h3>Browse {{type}} by {{ffield}}</h3>
+    <h3>Browse {{btype}}</h3>
+    {% if aggs_list %}
+        <div class="list-group">
+
+            <!-- <form id="browse_filter_form" method="post" action="/en/jprints/browse/{{btype}}/" > -->
+            <!-- <form id="browse_filter_form" method="post" action="{% url "core:browse_top" %}{{btype}}/" >  -->
+            <form id="browse_filter_form" method="post" action="{% url "core:browse" btype %}" >
+                {% csrf_token %}
+                {% if 'item_type' in aggs_list %}
+                    {% trans "Item Type" %}: 
+                    {% for key, val in aggs_list.item_type.items %}
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="item_type_{{key}}" onclick="this.form.submit();" 
+                                 {% if val.selected == 1 %} checked="checked" {% endif %}
+                                value="item_type_{{key}}">{% trans val.label %} ({{val.count}})</label>
+                    {% endfor %}
+                {% endif %}
+
+                {% if 'pub_status' in aggs_list %}
+                    <br/>{% trans "Publication Status" %}: 
+                    {% for key, val in aggs_list.pub_status.items %}
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="pub_status_{{key}}" onclick="this.form.submit();"
+                                 {% if val.selected == 1 %} checked="checked" {% endif %}
+                                value="pub_status_{{key}}">{% trans val.label %} ({{val.count}})</label>
+                    {% endfor %}
+                {% endif %}
+
+                {% if 'status' in aggs_list %}
+                    <br/>{% trans "Item Status" %}:
+                     {% for key, val in aggs_list.status.items %}
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="status_{{key}}" onclick="this.form.submit();" 
+                                 {% if val.selected == 1 %} checked="checked" {% endif %}
+                                value="status_{{key}}">{% trans val.label %} ({{val.count}})</label>
+                    {% endfor %}
+                {% endif %}
+
+                {% if 'milestone' in aggs_list %}
+                    <br/>{% trans "Year" %}:
+                     {% for key, val in aggs_list.milestone.items %}
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="milestone_{{val.label}}" onclick="this.form.submit();"
+                                 {% if val.selected == 1 %} checked="checked" {% endif %}
+                                value="milestone_{{val.label}}">{{val.label }} ({{val.count}})</label>
+                    {% endfor %}
+                {% endif %}
+
+                {% if 'user_org' in aggs_list %}
+                    <h4>User Organisation</h4>
+                {% endif %}
+                {% if 'user_dept' in aggs_list %}
+                    <h4>User Department</h4>
+                {% endif %}
+                {% if 'user_type' in aggs_list %}
+                    <h4>User Type</h4>
+                {% endif %}
+                {% if 'family' in aggs_list %}
+                    <h4>Family Name</h4>
+                {% endif %}
+                {% if 'first_char' in aggs_list %}
+                    <h4>Alphabetic List</h4>
+                {% endif %}
+
+<!--
+                {% for key, val in aggs_list.items %}
+                    <h4>{{key}} - {{val}} agg</h4> 
+                {% endfor %}
+                <br/>
+                <input type="submit" name="updatebrowse" value="Refresh" />
+-->
+            </form>
+
+        </div>
+    {% else %}
+        <p>There are no aggs in this view</p>
+    {% endif %}
+ 
     {% if result_list %}
         <div class="list-group">
         {% for result in result_list %}

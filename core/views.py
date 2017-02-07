@@ -6,8 +6,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+import re
+
 from core.forms import UserForm, PersonForm
-from core.elastic_search import run_query, run_filter
+from core.elastic_search import run_query, run_filter, run_agg_filter
 from .models import Person
 
 # Create your views here.
@@ -138,7 +140,47 @@ def filter(request, ftype, ffield ):
                 'type': ftype,    #"Publications", 
                 'ffield': ffield 
             }
+    return render(request, 'core/filter.html', context )
+
+
+def browse(request, ftype ):
+    result_list = []
+
+    #print("BROWSE xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+    item_filter_terms = []
+    pub_status_filter_terms = []
+    status_filter_terms = []
+    milestone_terms = []
+    filter_terms = []
+    if request.method == 'POST':
+        #print("BROWSE POST xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+
+        for pr in request.POST.items():
+            im = re.match( "^item_type_(?P<item>[A-Z]+)", pr[0])
+            if im:
+                filter_terms.append({"item_type":  im.group('item')})
+            pm = re.match( "^pub_status_(?P<item>[A-Z]+)", pr[0])
+            if pm:
+                filter_terms.append({"pub_status":  pm.group('item')})
+            sm = re.match( "^status_(?P<item>[A-Z]+)", pr[0])
+            if sm:
+                filter_terms.append({"status":  sm.group('item')})
+            ym = re.match( "^milestone_(?P<item>[0-9]+)", pr[0])
+            if ym:
+                the_year =  ym.group('item')+"||/y"
+                milestone_terms.append({"milestone":  { "gte": the_year, "lte": the_year, "format": "yyyy" } })
+
+    results = run_agg_filter( ftype, filter_terms, milestone_terms )
+    result_list = results['hits']
+    aggs_list = results['aggs']
+#    print("views.browse::result_list: ["+'\n'.join(map(str, result_list))+"]")
+#    print("views.browse::aggs_list: ["+'\n'.join(map(str, aggs_list))+"]")
+    context = { 'result_list': result_list, 
+                'aggs_list': aggs_list,
+                'btype': ftype, 
+            }
     return render(request, 'core/browse.html', context )
+
 
 
 

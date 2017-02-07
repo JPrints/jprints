@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %} Search {% endblock %}
+
+{% block body_block %}
+    <div> 
+    <h3>Browse {{type}} by {{ffield}}</h3>
+    {% if result_list %}
+        <div class="list-group">
+        {% for result in result_list %}
+            <div class="list-group-item">
+            {% if result.type == "publication" %}
+                <h4 class="list-group-item-heading">
+                <a href="{% url 'publication:detail' result.id %}">
+                    <img width="20px" height="20px" src="{% static 'images/' %}{{ result.obj.get_icon_name }}" alt="icon" /> {{ result.obj.get_search_citation }}</a>
+                </h4> 
+            {% elif result.type == "fulltext" %}
+                <h4 class="list-group-item-heading">
+                <a href="{% url 'publication:detail' result.obj.publication.id %}">
+                    <img width="20px" height="20px" src="{% static 'images/' %}{{ result.obj.publication.get_icon_name }}" alt="icon" /> FULLTEXT {{ result.obj.publication.get_search_citation }}</a>
+                </h4> 
+ 
+            {% elif result.type == "person" %}
+                <h4>
+                    <a href="{% url 'core:detail' result.id %}">
+                       <img width="20px" height="20px" src="{{ MEDIA_URL }}{{ result.obj.photo.name }}" alt="photo" /> {{ result.obj.get_search_citation }}
+                    </a>
+                </h4> ({{result.obj.orcid}})
+                {% endif %}
+                {% autoescape off %}
+                {% if result.highlight_t %}
+                   <p class="list-group-item-text">Found in title: {{ result.highlight_t }}</p>
+                {% endif %}
+                {% if result.highlight_a %}
+                   <p class="list-group-item-text">Found in abstract: {{ result.highlight_a }}</p>
+                {% endif %}
+                {% if result.highlight_ft %}
+                   <p class="list-group-item-text">Found in text: {{ result.highlight_ft }}</p>
+                {% endif %}
+                {% if result.highlight_f %}
+                   <p class="list-group-item-text">Found in family name: {{ result.highlight_f }}</p>
+                {% endif %}
+                {% if result.highlight_g %}
+                   <p class="list-group-item-text">Found in given name: {{ result.highlight_g }}</p>
+                {% endif %}
+                {% if result.highlight_b %}
+                   <p class="list-group-item-text">Found in fulltext: {{ result.highlight_b }}</p>
+                {% endif %}
+                {% if result.highlight_fn %}
+                   <p class="list-group-item-text">Found in file name: {{ result.highlight_fn }}</p>
+                {% endif %}
+                {% if result.highlight_fd %}
+                   <p class="list-group-item-text">Found in file description: {{ result.highlight_fd }}</p>
+                {% endif %}
+
+
+
+
+                {% endautoescape %}
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p>There are currently no items in this view</p>
+    {% endif %}
+    </div>
+{% endblock %}
+

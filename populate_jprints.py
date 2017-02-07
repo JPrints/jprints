@@ -7,7 +7,7 @@ django.setup()
 
 from django.conf import settings
 from elasticsearch import Elasticsearch
-from core.elastic_search import initialise_elastic_search, run_publication_filter, run_agg_filter
+from core.elastic_search import initialise_elastic_search, run_filter, run_agg_filter
 from django.contrib.auth.models import User
 from core.models import Person, Role, Permission
 from publications.models import Publication
@@ -19,7 +19,7 @@ def populate_publications():
          "depositor": "admin",
          "status": "I",
          "publication_type": "A",
-         "publication_status": "S",
+         "publication_status": "I",
          "visibility_status": "P",
          "title": "Article 1",
          "abstract": "An abstract for Article 1",
@@ -31,7 +31,7 @@ def populate_publications():
          "depositor": "admin",
          "status": "I",
          "publication_type": "A",
-         "publication_status": "S",
+         "publication_status": "I",
          "visibility_status": "P",
          "title": "Article 2",
          "abstract": "An abstract for Article 2",
@@ -43,7 +43,7 @@ def populate_publications():
          "depositor": "admin",
          "status": "I",
          "publication_type": "A",
-         "publication_status": "S",
+         "publication_status": "P",
          "visibility_status": "P",
          "title": "Article 3",
          "abstract": "An abstract for Article 3",
@@ -55,7 +55,7 @@ def populate_publications():
          "depositor": "test1",
          "status": "I",
          "publication_type": "S",
-         "publication_status": "S",
+         "publication_status": "P",
          "visibility_status": "P",
          "title": "Book Section 1 (One)",
          "abstract": "An abstract for Book Section One, note that One is also a family name",
@@ -79,10 +79,22 @@ def populate_publications():
          "depositor": "test3",
          "status": "I",
          "publication_type": "B",
+         "publication_status": "A",
+         "visibility_status": "P",
+         "title": "Book accepted",
+         "abstract": "An abstract for Book 1 that is accepted",
+         "subject": "1",
+         "divisions": "1",
+         "publication_date": "2015-01-02",
+         },
+          {
+         "depositor": "test3",
+         "status": "I",
+         "publication_type": "B",
          "publication_status": "S",
          "visibility_status": "P",
-         "title": "Book 1",
-         "abstract": "An abstract for Book 1",
+         "title": "Book submitted",
+         "abstract": "An abstract for Book 1 that is submitted",
          "subject": "1",
          "divisions": "1",
          "publication_date": "2015-01-02",
@@ -237,17 +249,18 @@ def clear_database():
 
 if __name__ == '__main__':
     print("clear database")
-    #clear_database()
+    clear_database()
 
     print("Setup Elastic Search indexes")
-    #initialise_elastic_search()
+    initialise_elastic_search()
 
     print("Start populate JPrints")
-    #populate_people()
-    #populate_publications()
+    populate_people()
+    populate_publications()
 
-    #run_publication_filter( "item_type", "A" )
-    #run_publication_filter( "item_type", "B" )
-    run_agg_filter(  )
+    #run_filter( "publication", "item_type", "A" )
+    #run_filter( "publication", "item_type", "B" )
+    run_agg_filter( "publication", {} )
+    run_agg_filter( "person", {} )
 
     print("Finished JPrints population script")
