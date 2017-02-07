@@ -1,14 +1,15 @@
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import ugettext as _
 
 from core.elastic_search import index_publication
 
 class Milestone(models.Model):
     MILESTONE_TYPES = (
-        ( 'D', 'Deposited' ),
-        ( 'L', 'Live' ),
-        ( 'A', 'Accepted' ),
-        ( 'P', 'Published' ),
+        ( 'D', _('Deposited') ),
+        ( 'L', _('Live') ),
+        ( 'A', _('Accepted') ),
+        ( 'P', _('Published') ),
     )
  
     date = models.DateTimeField()
@@ -18,33 +19,27 @@ class Contributor(models.Model):
     from core.models import Person
 
     CONTRIBUTION_TYPES = (
-        ( 'Au', 'Author' ),
-        ( 'Ed', 'Editor' ),
-        ( 'Ad', 'Advisor' ),
-        ( 'Re', 'Referee' ),
-        ( 'Tr', 'TRANSLATOR' ),
+        ( 'Au', _('Author') ),
+        ( 'Ed', _('Editor') ),
+        ( 'Ad', _('Advisor') ),
+        ( 'Re', _('Referee') ),
+        ( 'Tr', _('TRANSLATOR') ),
     )
  
     contribution_type = models.CharField(max_length=2, choices=CONTRIBUTION_TYPES)
     person = models.ForeignKey(Person)
 
-PUBLICATION_TYPES = (
-        ( 'A', 'Article' ),
-        ( 'B', 'Book' ),
-        ( 'S', 'Book Section' ),
-    )
-
 DOCUMENT_TYPES = (
-        ( 'dra', 'draft' ),
-        ( 'sub', 'submitted' ),
-        ( 'acc', 'accepted' ),
-        ( 'pub', 'published' ),
-        ( 'upd', 'updated' ),
-        ( 'sup', 'supplemental' ),
-        ( 'cov', 'coverimage' ),
-        ( 'dat', 'dataset' ),
-        ( 'pre', 'presentation' ),
-        ( 'oth', 'other' ),
+        ( 'dra', _('draft') ),
+        ( 'sub', _('submitted') ),
+        ( 'acc', _('accepted') ),
+        ( 'pub', _('published') ),
+        ( 'upd', _('updated') ),
+        ( 'sup', _('supplemental') ),
+        ( 'cov', _('coverimage') ),
+        ( 'dat', _('dataset') ),
+        ( 'pre', _('presentation') ),
+        ( 'oth', _('other') ),
     )
 
 LICENCES = (
@@ -59,10 +54,10 @@ LICENCES = (
     )
 
 VISIBILITY_STATES = (
-        ( 'P', 'Public' ),
-        ( 'R', 'Restricted' ),
-        ( 'E', 'Embagoed' ),
-        ( 'N', 'None' ),
+        ( 'P', _('Public') ),
+        ( 'R', _('Restricted') ),
+        ( 'E', _('Embagoed') ),
+        ( 'N', _('None') ),
     )
 
 
@@ -70,26 +65,32 @@ VISIBILITY_STATES = (
 class Publication(models.Model):
     from core.models import Person
 
+    PUBLICATION_TYPES = (
+        ( 'A', _('Article') ),
+        ( 'B', _('Book') ),
+        ( 'S', _('Book Section') ),
+    )
+
     STATUS_TYPES = (
-        ( 'I', 'inbox' ),
-        ( 'B', 'buffer' ),
-        ( 'A', 'archive' ),
-        ( 'D', 'deletion' ),
+        ( 'I', _('inbox') ),
+        ( 'B', _('buffer') ),
+        ( 'A', _('archive') ),
+        ( 'D', _('deletion') ),
     )
 
     PUBLICATION_STATES = (
-        ( 'S', 'Submitted' ),
-        ( 'A', 'Accepted' ),
-        ( 'P', 'Published' ),
-        ( 'I', 'In Press' ),
-        ( 'U', 'Unpublished' ),
+        ( 'S', _('Submitted') ),
+        ( 'A', _('Accepted') ),
+        ( 'P', _('Published') ),
+        ( 'I', _('In Press') ),
+        ( 'U', _('Unpublished') ),
     )
 
     VISIBILITY_STATES = (
-        ( 'P', 'Public' ),
-        ( 'R', 'Restricted' ),
-        ( 'E', 'Embagoed' ),
-        ( 'N', 'None' ),
+        ( 'P', _('Public') ),
+        ( 'R', _('Restricted') ),
+        ( 'E', _('Embagoed') ),
+        ( 'N', _('None') ),
     )
 
     # metadata fields
@@ -129,7 +130,7 @@ class Publication(models.Model):
     def get_publication_type_str(self):
         type = ""
         if (self.publication_type):
-            for t,n in PUBLICATION_TYPES:
+            for t,n in Publication.PUBLICATION_TYPES:
                 if ( t == self.publication_type ):
                     return n
         return type
@@ -149,8 +150,12 @@ class Publication(models.Model):
 
         return icon_name
 
-
-
+    def get_choice_disp_str( the_choices, key ):
+        disp = key
+        for t,n in the_choices:
+            if ( t == key ):
+                return n
+        return disp
 
     def __str__(self):
         return '%s %s' % (self.id, self.title)

@@ -1,0 +1,162 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-06 14:45+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: core/templates/core/browse.html:17
+msgid "Item Type"
+msgstr "Gegenstandsart"
+
+#: jprints/settings.py:150
+msgid "English"
+msgstr "Englisch"
+
+#: jprints/settings.py:151
+msgid "German"
+msgstr "Deutsche"
+
+#: publications/models.py:9
+msgid "Deposited"
+msgstr ""
+
+#: publications/models.py:10
+msgid "Live"
+msgstr ""
+
+#: publications/models.py:11 publications/models.py:83
+msgid "Accepted"
+msgstr ""
+
+#: publications/models.py:12 publications/models.py:84
+msgid "Published"
+msgstr ""
+
+#: publications/models.py:22
+msgid "Author"
+msgstr ""
+
+#: publications/models.py:23
+msgid "Editor"
+msgstr ""
+
+#: publications/models.py:24
+msgid "Advisor"
+msgstr ""
+
+#: publications/models.py:25
+msgid "Referee"
+msgstr ""
+
+#: publications/models.py:26
+msgid "TRANSLATOR"
+msgstr ""
+
+#: publications/models.py:33
+msgid "draft"
+msgstr ""
+
+#: publications/models.py:34
+msgid "submitted"
+msgstr ""
+
+#: publications/models.py:35
+msgid "accepted"
+msgstr ""
+
+#: publications/models.py:36
+msgid "published"
+msgstr ""
+
+#: publications/models.py:37
+msgid "updated"
+msgstr ""
+
+#: publications/models.py:38
+msgid "supplemental"
+msgstr ""
+
+#: publications/models.py:39
+msgid "coverimage"
+msgstr ""
+
+#: publications/models.py:40
+msgid "dataset"
+msgstr ""
+
+#: publications/models.py:41
+msgid "presentation"
+msgstr ""
+
+#: publications/models.py:42
+msgid "other"
+msgstr ""
+
+#: publications/models.py:57 publications/models.py:90
+msgid "Public"
+msgstr ""
+
+#: publications/models.py:58 publications/models.py:91
+msgid "Restricted"
+msgstr ""
+
+#: publications/models.py:59 publications/models.py:92
+msgid "Embagoed"
+msgstr ""
+
+#: publications/models.py:60 publications/models.py:93
+msgid "None"
+msgstr ""
+
+#: publications/models.py:69
+msgid "Article"
+msgstr "Zeitschriftenartikel"
+
+#: publications/models.py:70
+msgid "Book"
+msgstr "Buch"
+
+#: publications/models.py:71
+msgid "Book Section"
+msgstr "Buchbeitrag"
+
+#: publications/models.py:75
+msgid "inbox"
+msgstr ""
+
+#: publications/models.py:76
+msgid "buffer"
+msgstr ""
+
+#: publications/models.py:77
+msgid "archive"
+msgstr ""
+
+#: publications/models.py:78
+msgid "deletion"
+msgstr ""
+
+#: publications/models.py:82
+msgid "Submitted"
+msgstr ""
+
+#: publications/models.py:85
+msgid "In Press"
+msgstr ""
+
+#: publications/models.py:86
+msgid "Unpublished"
+msgstr ""

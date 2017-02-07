@@ -17,18 +17,21 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
 
 from core import views
 
 app_name = 'jprints'
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^about$', views.index, name='about'),
-    url(r'^jprints/', include('core.urls')),
-    url(r'^core/', include('core.urls')),
-    url(r'^pub/', include('publications.urls')),
     url(r'^proj/', include('projects.urls')),
     url(r'^admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
+urlpatterns += i18n_patterns(
+    url(r'^jprints/', include('core.urls')),
+    url(r'^about$', views.index, name='about'),
+    url(r'^core/', include('core.urls')),
+    url(r'^pub/', include('publications.urls')),
+)

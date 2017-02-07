@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Milestone, Contributor, Publication, Document, PUBLICATION_TYPES, DOCUMENT_TYPES, LICENCES, VISIBILITY_STATES
+from .models import Milestone, Contributor, Publication, Document, DOCUMENT_TYPES, LICENCES, VISIBILITY_STATES
 from core.models import Person
 
 class PublicationFormAdmin(forms.ModelForm):
@@ -8,7 +8,7 @@ class PublicationFormAdmin(forms.ModelForm):
     depositor = forms.ModelChoiceField(queryset=Person.objects.all(), help_text="Depositor", empty_label="Deposit on behalf of")
     publication_type = forms.CharField(
         max_length=1,
-        widget=forms.Select(choices=PUBLICATION_TYPES),
+        widget=forms.Select(choices=Publication.PUBLICATION_TYPES),
         help_text="Please enter the Publication Type")
     title = forms.CharField(max_length=200, help_text="title")
     abstract = forms.CharField(help_text="abstract", 
@@ -35,7 +35,7 @@ class PublicationFormDepositor(forms.ModelForm):
 
     publication_type = forms.CharField(
         max_length=1,
-        widget=forms.Select(choices=PUBLICATION_TYPES),
+        widget=forms.Select(choices=Publication.PUBLICATION_TYPES),
         help_text="Please enter the Publication Type")
     title = forms.CharField(max_length=200, help_text="title")
     abstract = forms.CharField(help_text="abstract", 
