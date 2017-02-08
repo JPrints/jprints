@@ -4,6 +4,7 @@ import re
 
 from datetime import datetime
 from elasticsearch import Elasticsearch
+from django.utils.translation import get_language
 
 def initialise_elastic_search():
 
@@ -71,17 +72,17 @@ def initialise_elastic_search():
                             "type" : "keyword",
                         },
                         "given" : {
-                            "type" : "keyword",
+                            "type" : "string",
                         },
                         "family" : {
-                            "type" : "keyword",
+                            "type" : "string",
                         },
  
                         "d_given" : {
-                            "type" : "keyword",
+                            "type" : "string",
                         },
                         "d_family" : {
-                            "type" : "keyword",
+                            "type" : "string",
                         },
                         "orcid" : {
                             "type" : "keyword",
@@ -96,7 +97,7 @@ def initialise_elastic_search():
                             "type" : "keyword",
                         },
                         "addr" : {
-                            "type" : "keyword",
+                            "type" : "string",
                         },
                         "first_char" : {
                             "type" : "keyword",
@@ -330,33 +331,107 @@ def run_query( query ):
                                         #{ "match": { "body": query } },
                                         #{ "match": { "milestone": query } },
     #res = es.search(index='jprints', body={"query": {"match_all": { }}})
-    res = es.search(index='jprints', 
-                     body={ 
-                            "query": { 
-                                "bool" :{
-                                    "should": [
-                                        { "match": { "family": query } },
-                                        { "match": { "given": query } },
-                                        { "match": { "title": query } },
-                                        { "match": { "abstract": query } },
-                                        { "match": { "filename": query } },
-                                        { "match": { "filedesc": query } }
-                                    ]
-                                } 
-                            },
-                            "highlight": {
-                                "fields": { 
-                                    "family": {}, 
-                                    "given": {}, 
-                                    "title": {}, 
-                                    "abstract": {},
-                                    "body": {},
-                                    "filename": {},
-                                    "filedesc": {},
-                                }
-                            }
-                        }   
-                    )
+
+
+    query_from = 0
+    query_size = 10
+
+    family_term = { 'match': { 'family' : query } }
+    family_d_term = { 'match': { 'd_family' : query } }
+    given_term  = { 'match': { 'given' : query } }
+    given_d_term  = { 'match': { 'd_given' : query } }
+    title_en_term  = { 'match': { 'title_en' : query } }
+    title_de_term  = { 'match': { 'title_de' : query } }
+    abstract_en_term  = { 'match': { 'abstract_en' : query } }
+    abstract_de_term  = { 'match': { 'abstract_de' : query } }
+    filename_term  = { 'match': { 'filename' : query } }
+    filedesc_term  = { 'match': { 'filedesc' : query } }
+    body_term  = { 'match': { 'body' : query } }
+
+    must_terms = {}
+    should_terms = [
+        family_term,
+        family_d_term,
+        given_term,
+        given_d_term,
+        filename_term,
+        filedesc_term,
+        body_term,
+    ] 
+    current_lang = get_language()
+    if current_lang:
+        print("Current language is:", current_lang )
+    else:
+        current_lang = "en"
+
+    if current_lang == "de":
+        should_terms.append(title_de_term)
+        should_terms.append(abstract_de_term)
+    else:
+        should_terms.append(title_en_term)
+        should_terms.append(abstract_en_term)
+
+    bool_terms = { 
+                    'should' : should_terms,
+                }
+
+    query = { "bool": bool_terms }
+
+    highlight_fields_en = { "family": {}, "family_d": {}, "given": {},"given_d": {}, 
+                            "title_en": {}, "abstract_en": {}, 
+                            "body": {}, "filename": {}, "filedesc": {}, }
+    highlight_fields_de = { "family": {},"family_d": {}, "given": {}, "given_d": {}, 
+                            "title_de": {}, "abstract_de": {}, 
+                            "body": {}, "filename": {}, "filedesc": {}, }
+
+    if current_lang == "de":
+        highlight_fields = { "fields": highlight_fields_de }
+    else:
+        highlight_fields = { "fields": highlight_fields_en }
+
+    dslraw = { 'from': query_from,
+               'size': query_size,
+               #'sort': sort_term,
+               'query': query, 
+               'highlight' : highlight_fields,
+               #'sort': sort, 
+               #'aggs': aggs,
+               #'post_filter': post_filter
+             } 
+
+    dsl = json.dumps( dslraw ) 
+
+    print( "run_query about to run \n\ndsl["+dsl+"]", 'formed from\n\n', dslraw );
+    res = es.search(index='jprints', body=dsl)
+
+#    res = es.search(index='jprints', 
+#                     body={ 
+#                            "query": { 
+#                                "bool" :{
+#                                    "should": [
+#                                        { "match": { "family": query } },
+#                                        { "match": { "given": query } },
+#                                        { "match": { "title": query } },
+#                                        { "match": { "abstract": query } },
+#                                        { "match": { "filename": query } },
+#                                        { "match": { "filedesc": query } }
+#                                    ]
+#                                } 
+#                            },
+#                            "highlight": {
+#                                "fields": { 
+#                                    "family": {}, 
+#                                    "given": {}, 
+#                                    "title": {}, 
+#                                    "abstract": {},
+#                                    "body": {},
+#                                    "filename": {},
+#                                    "filedesc": {},
+#                                }
+#                            }
+#                        }   
+#                    )
+
     print("Got %d Hits:" % res['hits']['total'])
 
     for hit in res['hits']['hits']:
@@ -372,36 +447,41 @@ def run_query( query ):
 
         highlight_title = ""
         highlight_abs = ""
-        highlight_text = ""
         highlight_family = ""
         highlight_given = ""
         highlight_body = ""
         highlight_filename = ""
         highlight_filedesc = ""
-        highlight = hit["highlight"]
-        for key,value in highlight.items():
-            print("highlight key:", key, "val:", value)
-            if key == "title":
-                highlight_title = value
-            elif key == "abstract":
-                highlight_abs = value
-            elif key == "text":
-                highlight_text = value
-            elif key == "family":
-                highlight_family = value
-            elif key == "given":
-                highlight_given = value
-            elif key == "body":
-                highlight_body = value
-            elif key == "filename":
-                highlight_filename = value
-            elif key == "filedesc":
-                highlight_filedesc = value
+        if 'highlight' in hit:
+            highlight = hit["highlight"]
+            for key,value in highlight.items():
+                print("highlight key:", key, "val:", value)
+                if key == "title_en":
+                    highlight_title = value
+                elif key == "title_de":
+                    highlight_title = value
+                elif key == "abstract_en":
+                    highlight_abs = value
+                elif key == "abstract_de":
+                    highlight_abs = value
+                elif key == "family":
+                    highlight_family = value
+                elif key == "family_d":
+                    highlight_family = value
+                elif key == "given":
+                    highlight_given = value
+                elif key == "given_d":
+                    highlight_given = value
+                elif key == "body":
+                    highlight_body = value
+                elif key == "filename":
+                    highlight_filename = value
+                elif key == "filedesc":
+                    highlight_filedesc = value
 
         results.append({
                     'highlight_t': highlight_title,
                     'highlight_a': highlight_abs,
-                    'highlight_ft': highlight_text,
                     'highlight_f': highlight_family,
                     'highlight_g': highlight_given,
                     'highlight_b': highlight_body,

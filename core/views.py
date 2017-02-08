@@ -122,6 +122,7 @@ def profiles(request):
 
 def search(request):
     result_list = []
+    query = ""
     print("search")
 
     if request.method == 'POST':
@@ -130,7 +131,10 @@ def search(request):
         if query:
             result_list = run_query(query)
             #print("views.search::result_list: ["+'\n'.join(map(str, result_list))+"]")
-    return render(request, 'core/search.html', {'result_list': result_list, 'query': query } )
+    context = { 'result_list': result_list, 
+                'query': query 
+              }
+    return render(request, 'core/search.html', context )
 
 def filter(request, ftype, ffield ):
     result_list = []
