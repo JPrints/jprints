@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^proj/', include('projects.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

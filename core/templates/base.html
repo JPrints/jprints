@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 {% load staticfiles %}
+{% load i18n %}
+
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -71,9 +73,27 @@
             <li><a href="{% url 'about' %}">Contact</a></li>
             <li><a href="{% url 'about' %}">About</a></li>
             <li><a href="{% url 'about' %}">Help</a></li>
-          </ul>
+         </ul>
 
           <ul class="nav navbar-nav navbar-right">
+            <li>
+                <form class="navbar-form navbar-right" action="{% url 'set_language' %}" method="post">
+                    {% csrf_token %}
+                    {% get_current_language as LANGUAGE_CODE %}
+                    <input name="next" type="hidden" value="{{ redirect_to }}" />
+                    <input name="language" 
+                        {% if LANGUAGE_CODE == "en" %} disabled {% endif %} 
+                        value="en" 
+                        onClick="this.form.submit()" 
+                        type="image" src="{% static "images/gb.png" %}" alt="EN">
+                    <input name="language" 
+                        {% if LANGUAGE_CODE == "de" %} disabled {% endif %}
+                        value="de" 
+                        onClick="this.form.submit()" 
+                        type="image" src="{% static "images/de.png" %}" alt="DE">
+                </form>
+            </li>
+ 
             <li>
               <form class="navbar-form navbar-right" role="search" method="post" action="{% url 'core:search' %}">
                 {% csrf_token %}
