@@ -102,6 +102,22 @@ def populate_publications():
    
    ]
 
+    for i in range(25):
+        test_pubs.append(
+          {
+            "depositor": "test3",
+            "status": "A",
+            "publication_type": "A",
+            "publication_status": "I",
+            "visibility_status": "P",
+            "title": "Test Article "+str(i),
+            "abstract": "An abstract for test article "+str(i)+" that is published",
+            "subject": "1",
+            "divisions": "1",
+            "publication_date": "2017-01-02",
+         },
+        )
+
     for pub in test_pubs:
         add_publication(pub)
 
@@ -260,7 +276,7 @@ if __name__ == '__main__':
 
     #run_filter( "publication", "item_type", "A" )
     #run_filter( "publication", "item_type", "B" )
-    run_agg_filter( "publication", {} )
-    run_agg_filter( "person", {} )
+    run_agg_filter( "publication", {}, {} )
+    #run_agg_filter( "person", {}, {} )
 
     print("Finished JPrints population script")

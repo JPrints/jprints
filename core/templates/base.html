@@ -75,7 +75,7 @@
 
           <ul class="nav navbar-nav navbar-right">
             <li>
-              <form class="navbar-form navbar-right" role="search" method="post" action="/jprints/search/">
+              <form class="navbar-form navbar-right" role="search" method="post" action="{% url 'core:search' %}">
                 {% csrf_token %}
                 <input type="text" class="form-control" placeholder="Search..." name="query" id="query">
              </form>

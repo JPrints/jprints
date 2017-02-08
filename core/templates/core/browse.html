@@ -11,7 +11,6 @@
         <div class="list-group">
 
             <!-- <form id="browse_filter_form" method="post" action="/en/jprints/browse/{{btype}}/" > -->
-            <!-- <form id="browse_filter_form" method="post" action="{% url "core:browse_top" %}{{btype}}/" >  -->
             <form id="browse_filter_form" method="post" action="{% url "core:browse" btype %}" >
                 {% csrf_token %}
                 {% if 'item_type' in aggs_list %}
@@ -77,6 +76,13 @@
                 <br/>
                 <input type="submit" name="updatebrowse" value="Refresh" />
 -->
+                <br/>
+                <br/>
+                <div class="text-center">
+                Showing results {{qfrom}} to {{qto}} of a total of {{total}}<br/>
+                {% if qfrom > 0 %}<input class="btn" type="submit" name="prev_{{qfrom}}_{{qsize}}" value="Prev" />{% endif %}
+                {% if qto < total %}<input class="btn" type="submit" name="next_{{qfrom}}_{{qsize}}" value="Next" />{% endif %}
+                </div>
             </form>
 
         </div>

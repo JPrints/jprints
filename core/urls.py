@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^search/$', views.search, name='search'),
     url(r'^filter/(?P<ftype>[\w]+)/(?P<ffield>[\w]+)/$', views.filter, name='filter'),
     url(r'^browse/(?P<ftype>[\w]+)/$', views.browse, name='browse'),
-    url(r'^browse/$', views.browse, name='browse_top'),
+    #url(r'^browse/$', views.browse, name='browse_top'),
 ]
 
 

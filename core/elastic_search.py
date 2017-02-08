@@ -164,7 +164,7 @@ def run_filter( ftype, ffield, fval ):
     print("elastic_search::run_filter results: ["+'\n'.join(map(str, results))+"]")
     return results
 
-def run_agg_filter( ftype, filter_terms, milestone_terms ):
+def run_agg_filter( ftype, query_from, query_size, filter_terms, milestone_terms ):
     from publications.models import Publication, Document
     from core.models import Person
     results = {} 
@@ -209,8 +209,6 @@ def run_agg_filter( ftype, filter_terms, milestone_terms ):
     bool_terms = { 'should' : terms }
     post_filter = { 'bool':  bool_terms } 
 
-    query_from = 0
-    query_size = 10
 
     dslraw = { 'from': query_from,
                'size': query_size,
@@ -223,11 +221,12 @@ def run_agg_filter( ftype, filter_terms, milestone_terms ):
 
     dsl = json.dumps( dslraw ) 
 
-    #print( "run_agg_filter about to run \n\ndsl["+dsl+"]", 'formed from\n\n', dslraw );
+    print( "run_agg_filter about to run \n\ndsl["+dsl+"]", 'formed from\n\n', dslraw );
     res = es.search(index='jprints', body=dsl)
     
     the_hits = []
-    #print("Got %d Hits:" % res['hits']['total'])
+    the_total = res['hits']['total']
+    print("Got %d Hits:" % res['hits']['total'])
     for hit in res['hits']['hits']:
         hit_type = hit["_type"]
         source = hit["_source"]
@@ -277,7 +276,8 @@ def run_agg_filter( ftype, filter_terms, milestone_terms ):
         
     results = { 
         'hits' : the_hits,
-        'aggs' : the_aggs
+        'aggs' : the_aggs,
+        'total': the_total
     }
     return results
 
@@ -327,6 +327,8 @@ def run_query( query ):
     results = []
     es = Elasticsearch()
     
+                                        #{ "match": { "body": query } },
+                                        #{ "match": { "milestone": query } },
     #res = es.search(index='jprints', body={"query": {"match_all": { }}})
     res = es.search(index='jprints', 
                      body={ 
@@ -337,8 +339,6 @@ def run_query( query ):
                                         { "match": { "given": query } },
                                         { "match": { "title": query } },
                                         { "match": { "abstract": query } },
-                                        { "match": { "body": query } },
-                                        { "match": { "milestone": query } },
                                         { "match": { "filename": query } },
                                         { "match": { "filedesc": query } }
                                     ]
@@ -412,7 +412,7 @@ def run_query( query ):
                     'obj': obj,
                     })
 
-    #print("elastic_search::run_query results: ["+'\n'.join(map(str, results))+"]")
+    print("elastic_search::run_query results: ["+'\n'.join(map(str, results))+"]")
     return results
 
 def index_person( person ):

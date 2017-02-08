@@ -122,9 +122,11 @@ def profiles(request):
 
 def search(request):
     result_list = []
+    print("search")
 
     if request.method == 'POST':
         query = request.POST['query'].strip()
+        print("search query", query)
         if query:
             result_list = run_query(query)
             #print("views.search::result_list: ["+'\n'.join(map(str, result_list))+"]")
@@ -146,16 +148,34 @@ def filter(request, ftype, ffield ):
 def browse(request, ftype ):
     result_list = []
 
-    #print("BROWSE xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+    print("BROWSE xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
     item_filter_terms = []
     pub_status_filter_terms = []
     status_filter_terms = []
     milestone_terms = []
     filter_terms = []
+    query_from = 0
+    query_size = 10
     if request.method == 'POST':
-        #print("BROWSE POST xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+        print("BROWSE POST xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 
         for pr in request.POST.items():
+            print("got post item", pr)
+            next_btn = re.match( "^next_(?P<from>[0-9]+)_(?P<size>[0-9]+)", pr[0])
+            if next_btn:
+                print("GOT NEXT BTN", next_btn.group('from'), next_btn.group('size') )
+                query_size = int(next_btn.group('size'))
+                query_from = int(next_btn.group('from')) + query_size
+
+            prev_btn = re.match( "^prev_(?P<from>[0-9]+)_(?P<size>[0-9]+)", pr[0])
+            if prev_btn:
+                print("GOT PREV BTN", prev_btn.group('from'), prev_btn.group('size') )
+                query_size = int(prev_btn.group('size'))
+                query_from = int(prev_btn.group('from')) - query_size
+                if query_from < 0:
+                    query_from = 0
+                print("PREV BTN", query_from, query_size )
+
             im = re.match( "^item_type_(?P<item>[A-Z]+)", pr[0])
             if im:
                 filter_terms.append({"item_type":  im.group('item')})
@@ -170,14 +190,23 @@ def browse(request, ftype ):
                 the_year =  ym.group('item')+"||/y"
                 milestone_terms.append({"milestone":  { "gte": the_year, "lte": the_year, "format": "yyyy" } })
 
-    results = run_agg_filter( ftype, filter_terms, milestone_terms )
+    results = run_agg_filter( ftype, query_from, query_size, filter_terms, milestone_terms )
     result_list = results['hits']
     aggs_list = results['aggs']
-#    print("views.browse::result_list: ["+'\n'.join(map(str, result_list))+"]")
+    total = results['total']
+    qto = query_from + query_size
+    if qto > int(total):
+        qto = total
+    print("from", query_from, "to", qto, "total", total)
+    print("views.browse::result_list: ["+'\n'.join(map(str, result_list))+"]")
 #    print("views.browse::aggs_list: ["+'\n'.join(map(str, aggs_list))+"]")
     context = { 'result_list': result_list, 
                 'aggs_list': aggs_list,
                 'btype': ftype, 
+                'qfrom': query_from,
+                'qto'  : qto,
+                'qsize': query_size,
+                'total': total,
             }
     return render(request, 'core/browse.html', context )
 
