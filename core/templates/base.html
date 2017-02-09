@@ -47,32 +47,32 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="{% url 'index' %}">Home</a></li>
+            <li><a href="{% url 'index' %}">{% trans "Home" %}</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Browse <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="{% url 'core:browse' 'publication' %}">Publications</a></li>
-            	<li><a href="{% url 'core:browse'  'person' %}">Profiles</a></li>
-                <li><a href="{% url 'core:browse' 'project' %}">Projects</a></li>
+                <li><a href="{% url 'core:browse' 'publication' %}">{% trans "Publications" %}</a></li>
+            	<li><a href="{% url 'core:browse'  'person' %}">{% trans "Profiles" %}</a></li>
+                <li><a href="{% url 'core:browse' 'project' %}">{% trans "Projects" %}</a></li>
               </ul>
             </li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Filter <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="{% url 'core:filter' 'publication' 'all' %}">Publications</a></li>
-            	<li><a href="{% url 'core:profiles' %}">Profiles</a></li>
-                <li><a href="{% url 'core:filter' 'all' 'all' %}">Projects</a></li>
+                <li><a href="{% url 'core:filter' 'publication' 'all' %}">{% trans "Publications" %}</a></li>
+            	<li><a href="{% url 'core:profiles' %}">{% trans "Profiles" %}</a></li>
+                <li><a href="{% url 'core:filter' 'all' 'all' %}">{% trans "Projects" %}</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href="{% url 'core:filter' 'all' 'all' %}">All items</a></li>
-                <li><a href="{% url 'core:filter' 'publication' 'item_type' %}">type</a></li>
-                <li><a href="{% url 'core:filter' 'publication' 'year' %}">Year</a></li>
+                <li><a href="{% url 'core:filter' 'all' 'all' %}">{% trans "All items" %}</a></li>
+                <li><a href="{% url 'core:filter' 'publication' 'item_type' %}">{% trans "type" %}</a></li>
+                <li><a href="{% url 'core:filter' 'publication' 'year' %}">{% trans "Year" %}</a></li>
               </ul>
             </li>
  
-            <li><a href="/admin" target="_new">Admin</a></li>
-            <li><a href="{% url 'about' %}">Contact</a></li>
-            <li><a href="{% url 'about' %}">About</a></li>
-            <li><a href="{% url 'about' %}">Help</a></li>
+            <li><a href="/admin" target="_new">{% trans "Admin" %}</a></li>
+            <li><a href="{% url 'about' %}">{% trans "Contact" %}</a></li>
+            <li><a href="{% url 'about' %}">{% trans "About" %}</a></li>
+            <li><a href="{% url 'about' %}">{% trans "Help" %}</a></li>
          </ul>
 
           <ul class="nav navbar-nav navbar-right">
@@ -97,29 +97,29 @@
             <li>
               <form class="navbar-form navbar-right" role="search" method="post" action="{% url 'core:search' %}">
                 {% csrf_token %}
-                <input type="text" class="form-control" placeholder="Search..." name="query" id="query">
+                <input type="text" class="form-control" placeholder="{% trans "Search..." %}" name="query" id="query">
              </form>
            </li>
           </ul>
 
           <ul class="nav navbar-nav navbar-line2">
           {% if user.is_authenticated %}
-            <li><a href="{% url 'core:logout' %}?next=/jprints/">Logout</a></li>
-            <li><a href="{% url 'core:profile' %}">My Profile</a></li>
+            <li><a href="{% url 'core:logout' %}?next=/jprints/">{% trans "Logout" %}</a></li>
+            <li><a href="{% url 'core:profile' %}">{% trans "My Profile" %}</a></li>
 
-            <li><a href="{% url 'publication:index' %}">My Publications</a></li>
-            <li><a href="{% url 'core:profiles' %}">My Projects</a></li>
+            <li><a href="{% url 'publication:index' %}">{% trans "My Publications" %}</a></li>
+            <li><a href="{% url 'core:profiles' %}">{% trans "My Projects" %}</a></li>
 
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">New...<span class="caret"></span></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "New...<span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="{% url 'publication:add_publication' %}">New Publication</a></li>
-                <li><a href="{% url 'publication:add_publication' %}">New Project</a></li>
+                <li><a href="{% url 'publication:add_publication' %}">{% trans "New Publication" %}</a></li>
+                <li><a href="{% url 'publication:add_publication' %}">{% trans "New Project" %}</a></li>
               </ul>
             </li>
           {% else %}
-            <li><a href="{% url 'core:login' %}">Login</a></li>
-            <li><a href="{% url 'core:register' %}">Register</a></li>
+            <li><a href="{% url 'core:login' %}">{% trans "Login" %}</a></li>
+            <li><a href="{% url 'core:register' %}">{% trans "Register" %}</a></li>
           {% endif %}
           </ul>
         </div><!--/.nav-collapse -->

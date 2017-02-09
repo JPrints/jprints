@@ -79,9 +79,9 @@
                 <br/>
                 <br/>
                 <div class="text-center">
-                Showing results {{qfrom}} to {{qto}} of a total of {{total}}<br/>
-                {% if qfrom > 0 %}<input class="btn" type="submit" name="prev_{{qfrom}}_{{qsize}}" value="Prev" />{% endif %}
-                {% if qto < total %}<input class="btn" type="submit" name="next_{{qfrom}}_{{qsize}}" value="Next" />{% endif %}
+                {% trans "Showing results" %} {{qfrom}} {% trans "to" %} {{qto}} {% trans "of a total of" %} {{total}}<br/>
+                {% if qfrom > 0 %}<input class="btn" type="submit" name="prev_{{qfrom}}_{{qsize}}" value="{% trans "Prev" %}" />{% endif %}
+                {% if qto < total %}<input class="btn" type="submit" name="next_{{qfrom}}_{{qsize}}" value="{% trans "Next" %}" />{% endif %}
                 </div>
             </form>
 
@@ -112,36 +112,7 @@
                     </a>
                 </h4> ({{result.obj.orcid}})
                 {% endif %}
-                {% autoescape off %}
-                {% if result.highlight_t %}
-                   <p class="list-group-item-text">Found in title: {{ result.highlight_t }}</p>
-                {% endif %}
-                {% if result.highlight_a %}
-                   <p class="list-group-item-text">Found in abstract: {{ result.highlight_a }}</p>
-                {% endif %}
-                {% if result.highlight_ft %}
-                   <p class="list-group-item-text">Found in text: {{ result.highlight_ft }}</p>
-                {% endif %}
-                {% if result.highlight_f %}
-                   <p class="list-group-item-text">Found in family name: {{ result.highlight_f }}</p>
-                {% endif %}
-                {% if result.highlight_g %}
-                   <p class="list-group-item-text">Found in given name: {{ result.highlight_g }}</p>
-                {% endif %}
-                {% if result.highlight_b %}
-                   <p class="list-group-item-text">Found in fulltext: {{ result.highlight_b }}</p>
-                {% endif %}
-                {% if result.highlight_fn %}
-                   <p class="list-group-item-text">Found in file name: {{ result.highlight_fn }}</p>
-                {% endif %}
-                {% if result.highlight_fd %}
-                   <p class="list-group-item-text">Found in file description: {{ result.highlight_fd }}</p>
-                {% endif %}
 
-
-
-
-                {% endautoescape %}
             </div>
         {% endfor %}
         </div>

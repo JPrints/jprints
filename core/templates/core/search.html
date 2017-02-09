@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load staticfiles %}
 
 {% block title %} Search {% endblock %}
@@ -30,29 +31,29 @@
                 {% endif %}
                 {% autoescape off %}
                 {% if result.highlight_t %}
-                   <p class="list-group-item-text">Found in title: {{ result.highlight_t }}</p>
+                   <p class="list-group-item-text">{% trans "Found in title" %}: {{ result.highlight_t }}</p>
                 {% endif %}
                 {% if result.highlight_a %}
-                   <p class="list-group-item-text">Found in abstract: {{ result.highlight_a }}</p>
+                   <p class="list-group-item-text">{% trans "Found in abstract" %}: {{ result.highlight_a }}</p>
+                {% endif %}
+                {% if result.highlight_ft %}
+                   <p class="list-group-item-text">{% trans "Found in text" %}: {{ result.highlight_ft }}</p>
                 {% endif %}
                 {% if result.highlight_f %}
-                   <p class="list-group-item-text">Found in family name: {{ result.highlight_f }}</p>
+                   <p class="list-group-item-text">{% trans "Found in family name" %}: {{ result.highlight_f }}</p>
                 {% endif %}
                 {% if result.highlight_g %}
-                   <p class="list-group-item-text">Found in given name: {{ result.highlight_g }}</p>
+                   <p class="list-group-item-text">{% trans "Found in given name" %}: {{ result.highlight_g }}</p>
                 {% endif %}
                 {% if result.highlight_b %}
-                   <p class="list-group-item-text">Found in fulltext: {{ result.highlight_b }}</p>
+                   <p class="list-group-item-text">{% trans "Found in fulltext" %}: {{ result.highlight_b }}</p>
                 {% endif %}
                 {% if result.highlight_fn %}
-                   <p class="list-group-item-text">Found in file name: {{ result.highlight_fn }}</p>
+                   <p class="list-group-item-text">{% trans "Found in file name" %}: {{ result.highlight_fn }}</p>
                 {% endif %}
                 {% if result.highlight_fd %}
-                   <p class="list-group-item-text">Found in file description: {{ result.highlight_fd }}</p>
+                   <p class="list-group-item-text">{% trans "Found in file description" %}: {{ result.highlight_fd }}</p>
                 {% endif %}
-
-
-
 
                 {% endautoescape %}
             </div>

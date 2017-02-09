@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-06 14:45+0000\n"
+"POT-Creation-Date: 2017-02-09 11:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,9 +17,149 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: core/templates/base.html:50
+msgid "Home"
+msgstr ""
+
+#: core/templates/base.html:54 core/templates/base.html:62
+msgid "Publications"
+msgstr "Veröffentlichungen"
+
+#: core/templates/base.html:55 core/templates/base.html:63
+msgid "Profiles"
+msgstr "Profile"
+
+#: core/templates/base.html:56 core/templates/base.html:64
+msgid "Projects"
+msgstr "Projekte"
+
+#: core/templates/base.html:66
+msgid "All items"
+msgstr "Alle Elemente"
+
+#: core/templates/base.html:67
+msgid "type"
+msgstr "sorte"
+
+#: core/templates/base.html:68 core/templates/core/browse.html:47
+msgid "Year"
+msgstr "Jahr"
+
+#: core/templates/base.html:72
+msgid "Admin"
+msgstr "Verwaltung"
+
+#: core/templates/base.html:73
+msgid "Contact"
+msgstr "Kontakt"
+
+#: core/templates/base.html:74
+msgid "About"
+msgstr "Über"
+
+#: core/templates/base.html:75
+msgid "Help"
+msgstr "Hilfe"
+
+#: core/templates/base.html:100
+msgid "Search..."
+msgstr "Suche..."
+
+#: core/templates/base.html:107
+msgid "Logout"
+msgstr "Ausloggen"
+
+#: core/templates/base.html:108
+msgid "My Profile"
+msgstr "Mein Profil"
+
+#: core/templates/base.html:110
+msgid "My Publications"
+msgstr "Meine Veröffentlichungen"
+
+#: core/templates/base.html:111
+msgid "My Projects"
+msgstr "Meine Projekte"
+
+#: core/templates/base.html:116
+msgid "New Publication"
+msgstr "Neue Veröffentlichung"
+
+#: core/templates/base.html:117
+msgid "New Project"
+msgstr "Neues Projekt"
+
+#: core/templates/base.html:121
+msgid "Login"
+msgstr "Anmeldung"
+
+#: core/templates/base.html:122
+msgid "Register"
+msgstr "Neu registrieren"
+
 #: core/templates/core/browse.html:17
 msgid "Item Type"
 msgstr "Gegenstandsart"
+
+#: core/templates/core/browse.html:27
+msgid "Publication Status"
+msgstr "Veröffentlichungsstatus"
+
+#: core/templates/core/browse.html:37
+msgid "Item Status"
+msgstr "Artikelstatus"
+
+#: core/templates/core/browse.html:82
+msgid "Showing results"
+msgstr "Ergebnisse"
+
+#: core/templates/core/browse.html:82
+msgid "to"
+msgstr "auf"
+
+#: core/templates/core/browse.html:82
+msgid "of a total of"
+msgstr "von insgesamt"
+
+#: core/templates/core/browse.html:83
+msgid "Prev"
+msgstr "bisherige"
+
+#: core/templates/core/browse.html:84
+msgid "Next"
+msgstr "Nächster"
+
+#: core/templates/core/browse.html:117
+msgid "Found in title"
+msgstr "Gefunden in Titel"
+
+#: core/templates/core/browse.html:120
+msgid "Found in abstract"
+msgstr "Gefunden in Abstract"
+
+#: core/templates/core/browse.html:123
+msgid "Found in text"
+msgstr "Gefunden in text"
+
+#: core/templates/core/browse.html:126
+msgid "Found in family name"
+msgstr "Gefunden im Familiennamen"
+
+#: core/templates/core/browse.html:129
+msgid "Found in given name"
+msgstr "Gefunden in Vorname"
+
+#: core/templates/core/browse.html:132
+msgid "Found in fulltext"
+msgstr "Gefunden in fulltext"
+
+#: core/templates/core/browse.html:135
+msgid "Found in file name"
+msgstr "Gefunden in Dateinamen"
+
+#: core/templates/core/browse.html:138
+msgid "Found in file description"
+msgstr "Gefunden in der Beschreibung"
 
 #: jprints/settings.py:150
 msgid "English"
