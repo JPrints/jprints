@@ -7,10 +7,10 @@ django.setup()
 
 from django.conf import settings
 from elasticsearch import Elasticsearch
-from core.elastic_search import initialise_elastic_search, run_filter, run_agg_filter
+from core.elastic_search import initialise_elastic_search, initialise_pipeline, run_filter, run_agg_filter
 from django.contrib.auth.models import User
 from core.models import Person, Role, Permission
-from publications.models import Publication
+from publications.models import Publication, Document
 
 def populate_publications():
 
@@ -26,6 +26,7 @@ def populate_publications():
          "subject": "1",
          "divisions": "1",
          "publication_date": "2017-01-02",
+         "document": "test_doc_1.pdf",
          },
          {
          "depositor": "admin",
@@ -38,6 +39,7 @@ def populate_publications():
          "subject": "1",
          "divisions": "1",
          "publication_date": "2017-01-02",
+         "document": "test_doc_2.pdf",
          },
          {
          "depositor": "admin",
@@ -50,6 +52,7 @@ def populate_publications():
          "subject": "1",
          "divisions": "1",
          "publication_date": "2016-01-02",
+         "document": "test_doc_3.pdf",
          },
          {
          "depositor": "test1",
@@ -62,6 +65,7 @@ def populate_publications():
          "subject": "1",
          "divisions": "1",
          "publication_date": "2015-01-02",
+         "document": "test_doc_1.odt",
          },
          {
          "depositor": "test2",
@@ -74,6 +78,7 @@ def populate_publications():
          "subject": "1",
          "divisions": "1",
          "publication_date": "2015-01-02",
+         "document": "test_doc_1.txt",
          },
          {
          "depositor": "test3",
@@ -86,6 +91,7 @@ def populate_publications():
          "subject": "1",
          "divisions": "1",
          "publication_date": "2015-01-02",
+         "document": "test_doc_1.docx",
          },
           {
          "depositor": "test3",
@@ -123,7 +129,7 @@ def populate_publications():
 
 def add_publication(pub):
     print("add publication: depositor {0} type {1} title {2}".format(str(pub["depositor"]), str(pub["publication_type"]), str(pub["title"])))
-    print("add publication: date", str(pub["publication_date"]) )
+    #print("add publication: date", str(pub["publication_date"]) )
     u = User.objects.get_or_create(username=pub["depositor"])[0]
     person = Person.objects.get_or_create(user=u)[0]
     #print("add_publication called person", person.id,  "user", u.id )
@@ -140,9 +146,23 @@ def add_publication(pub):
     #p.accept_date = pub["accept_date"]
     #p.submit_date = pub["submit_date"]
     #p.complete_date = pub["complete_date"]
-    p.save()
     print("added publication:", "id", p.id, "date", p.publication_date )
 
+    if ( "document" in pub ):
+        d = Document.objects.get_or_create(publication=p)[0]
+        d.save()
+        src_path = settings.STATIC_DIR + "/testdoc/"+pub["document"]
+        doc_path = "/pub/"+str(p.id)+"/doc/"+str(d.id)+"/"
+        doc_name = pub["document"]
+        dest_path = settings.MEDIA_DIR + doc_path
+        os.makedirs(dest_path)
+        shutil.copy(src_path, dest_path+doc_name)
+        print("Pub doc", "src", src_path, "dest", dest_path)
+        d.filefield.name = doc_path+doc_name
+
+        d.save()
+        print("added DOCUMENT ", d.id, "to publication id", p.id, "file", d.filefield.name )
+    p.save()
 
 def populate_people():
 
@@ -219,6 +239,8 @@ def populate_people():
 def add_user(user):
     print("add user: {0} {1} {2}".format(str(user["username"]), str(user["first"]), str(user["last"])))
     u = User.objects.get_or_create(username=user["username"], email=user["email"], first_name=user["first"], last_name=user["last"])[0]
+    u.set_password("pypuser1")
+    u.save()
     p = Person.objects.get_or_create(user=u)[0]
     p.disp_title = user["disp_title"]
     p.disp_given = user["disp_given"]
@@ -270,13 +292,16 @@ if __name__ == '__main__':
     print("Setup Elastic Search indexes")
     initialise_elastic_search()
 
+    print("Setup Elastic Search ingest pipeline")
+    initialise_pipeline()
+
     print("Start populate JPrints")
     populate_people()
     populate_publications()
 
     #run_filter( "publication", "item_type", "A" )
     #run_filter( "publication", "item_type", "B" )
-    run_agg_filter( "publication", {}, {} )
+    #run_agg_filter( "publication", {}, {} )
     #run_agg_filter( "person", {}, {} )
 
     print("Finished JPrints population script")

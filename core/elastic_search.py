@@ -1,10 +1,40 @@
 import json
 import urllib
 import re
+import requests
+from tika import parser
+import base64
 
 from datetime import datetime
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, NotFoundError
 from django.utils.translation import get_language
+from django.conf import settings
+
+
+def initialise_pipeline():
+    es = Elasticsearch()
+    try:
+        ingest = es.ingest.get_pipeline( [ "attachment" ])
+        print("pipeline found: ", ingest)
+        res = es.ingest.delete_pipeline( "attachment" )
+        print("pipeline deleted: ", res)
+    except NotFoundError:
+        print("pipeline not found")
+
+    res = es.ingest.put_pipeline( "attachment", 
+        body = { 
+            "description" : "Extract fulltext data",
+            "processors" : [
+                {
+                      "attachment" : {
+                              "field" : "data",
+                              "target_field" : "attachment"
+                      }
+                }
+            ]
+    })
+    print("pipeline created: ", res)
+
 
 def initialise_elastic_search():
 
@@ -191,9 +221,11 @@ def run_agg_filter( ftype, query_from, query_size, filter_terms, milestone_terms
             "org" : { "terms": { "field": "org" } }, 
             "dept": { "terms": { "field": "dept" } }, 
             "user_type": { "terms": { "field": "user_type" } }, 
-            "family"   : { "terms": { "field": "family" } }, 
+    #        "family"   : { "terms": { "field": "family" } }, 
             "first_char" : { "terms": { "field": "first_char" } }, 
         } 
+    else:
+        aggs = { }
 
     post_filter = { } 
     terms = []
@@ -246,34 +278,35 @@ def run_agg_filter( ftype, query_from, query_size, filter_terms, milestone_terms
                     })
 
     the_aggs = {}
-    for k,v in res['aggregations'].items():
-        this_agg = {}
-        for bucket in res['aggregations'][k]['buckets']:
-            key_name = bucket['key']
-            key_label = ""
-            key_count = 0
-            key_selected = 0
-            if 'key_as_string' in bucket:
-                key_label = bucket['key_as_string']
-            else:
-                key_label = get_bucket_key_str( k, bucket['key'] )
+    if 'aggregations' in res:
+        for k,v in res['aggregations'].items():
+            this_agg = {}
+            for bucket in res['aggregations'][k]['buckets']:
+                key_name = bucket['key']
+                key_label = ""
+                key_count = 0
+                key_selected = 0
+                if 'key_as_string' in bucket:
+                    key_label = bucket['key_as_string']
+                else:
+                    key_label = get_bucket_key_str( k, bucket['key'] )
 
-            if 'doc_count' in bucket:
-                key_count = bucket['doc_count']
-            if is_key_selected( k, key_name, filter_terms, milestone_terms ):
-                key_selected = 1
-                print("found item")
-            elif is_key_selected( k, key_label, filter_terms, milestone_terms ):
-                key_selected = 1
-                print("found item")
+                if 'doc_count' in bucket:
+                    key_count = bucket['doc_count']
+                if is_key_selected( k, key_name, filter_terms, milestone_terms ):
+                    key_selected = 1
+                    print("found item")
+                elif is_key_selected( k, key_label, filter_terms, milestone_terms ):
+                    key_selected = 1
+                    print("found item")
 
-            this_agg[key_name] = {}
-            this_agg[key_name]['count'] = key_count
-            this_agg[key_name]['label'] = key_label
-            this_agg[key_name]['selected'] = key_selected
+                this_agg[key_name] = {}
+                this_agg[key_name]['count'] = key_count
+                this_agg[key_name]['label'] = key_label
+                this_agg[key_name]['selected'] = key_selected
 
-        the_aggs[k] = this_agg
-        #print("the aggs", the_aggs)
+            the_aggs[k] = this_agg
+            #print("the aggs", the_aggs)
         
     results = { 
         'hits' : the_hits,
@@ -563,23 +596,40 @@ def index_publication( publication ):
     }
     res = es.index( index='jprints', doc_type="publication", id=publication.id, body=doc ) 
 
-    print("index DOCS !!!!!!!!!!!!!!!!! for publication [", publication.id, "]")
     documents = Document.objects.filter(publication__id=publication.id)
     for fulltext in documents:
-        the_text =  "A full text for Article 2 edited"
-        index_id = str(publication.id) 
-        index_id += "_"
-        index_id += str(fulltext.id) 
-        print("index id[",index_id,"] doc[", fulltext.id, "] name[", fulltext.filefield.name, "]")
-        doc = {
-            #'id'        : index_id,
-            'id'        : 1000*publication.id,
-            'body'      : the_text,
-            'filename'  : fulltext.filefield.name,
-            'filedesc'  : fulltext.description,
-            'timestamp' : datetime.now(),
-        }
-        res = es.index( index='jprints', doc_type="fulltext", id=fulltext.id, body=doc ) 
+        try:
+            doc_path = settings.MEDIA_DIR + fulltext.filefield.name
+            doc_text = parser.from_file(doc_path) 
+
+            b64_text = base64.b64encode(doc_text['content'].encode("utf-8"))
+            b64_ascii = str( b64_text, 'ascii' )
+            ingest_body = { "data": b64_ascii }
+
+            ##### works
+            #b64_text = base64.b64encode(b'this is my text')
+            #b64_ascii = str( b64_text, 'ascii' )
+            #print( b64_ascii )
+            #ingest_body = { "data": b64_ascii }
+            ##### end works
+
+            ##### works
+            #b64_text  = "e1xydGYxXGFuc2kNCkxvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0DQpccGFyIH0="
+            #ingest_body = { "data": b64_text }
+            ##### end works
+            ##### works
+            #ingest_body = { "data": "e1xydGYxXGFuc2kNCkxvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0DQpccGFyIH0=" }
+            ##### end works
+
+            ingest_id = str(publication.id)+'_'+str(fulltext.id)
+            ingest_url = 'http://localhost:9200/jprints/fulltext/'+ingest_id+'?pipeline=attachment'
+            headers = { 'Content-Type': 'application/json' }
+            ingest_res = requests.put( ingest_url, headers=headers, data=json.dumps(ingest_body) )
+
+            print("REAL INGEST RESULT !!!!!!!!!!!!!!!!! ", ingest_res.text)
+        except FileNotFoundError:
+            print("############################### FILE NOT FOUND")
+
 
 
 
