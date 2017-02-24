@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-09 11:21+0000\n"
+"POT-Creation-Date: 2017-02-09 12:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,7 +19,11 @@ msgstr ""
 
 #: core/templates/base.html:50
 msgid "Home"
-msgstr ""
+msgstr "Home"
+
+#: core/templates/base.html:52
+msgid "Browse"
+msgstr "Browsen nach"
 
 #: core/templates/base.html:54 core/templates/base.html:62
 msgid "Publications"
@@ -81,6 +85,10 @@ msgstr "Meine Veröffentlichungen"
 msgid "My Projects"
 msgstr "Meine Projekte"
 
+#: core/templates/base.html:114
+msgid "New"
+msgstr "Neu"
+
 #: core/templates/base.html:116
 msgid "New Publication"
 msgstr "Neue Veröffentlichung"
@@ -129,35 +137,35 @@ msgstr "bisherige"
 msgid "Next"
 msgstr "Nächster"
 
-#: core/templates/core/browse.html:117
+#: core/templates/core/search.html:34
 msgid "Found in title"
-msgstr "Gefunden in Titel"
+msgstr "Gefunden im Titel"
 
-#: core/templates/core/browse.html:120
+#: core/templates/core/search.html:37
 msgid "Found in abstract"
-msgstr "Gefunden in Abstract"
+msgstr "Gefunden im Abstract"
 
-#: core/templates/core/browse.html:123
+#: core/templates/core/search.html:40
 msgid "Found in text"
-msgstr "Gefunden in text"
+msgstr "Gefunden im text"
 
-#: core/templates/core/browse.html:126
+#: core/templates/core/search.html:43
 msgid "Found in family name"
 msgstr "Gefunden im Familiennamen"
 
-#: core/templates/core/browse.html:129
+#: core/templates/core/search.html:46
 msgid "Found in given name"
-msgstr "Gefunden in Vorname"
+msgstr "Gefunden im Vorname"
 
-#: core/templates/core/browse.html:132
+#: core/templates/core/search.html:49
 msgid "Found in fulltext"
-msgstr "Gefunden in fulltext"
+msgstr "Gefunden im fulltext"
 
-#: core/templates/core/browse.html:135
+#: core/templates/core/search.html:52
 msgid "Found in file name"
-msgstr "Gefunden in Dateinamen"
+msgstr "Gefunden im Dateinamen"
 
-#: core/templates/core/browse.html:138
+#: core/templates/core/search.html:55
 msgid "Found in file description"
 msgstr "Gefunden in der Beschreibung"
 
