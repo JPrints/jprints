@@ -49,7 +49,7 @@
           <ul class="nav navbar-nav">
             <li><a href="{% url 'index' %}">{% trans "Home" %}</a></li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Browse <span class="caret"></span></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Browse" %} <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href="{% url 'core:browse' 'publication' %}">{% trans "Publications" %}</a></li>
             	<li><a href="{% url 'core:browse'  'person' %}">{% trans "Profiles" %}</a></li>
@@ -111,7 +111,7 @@
             <li><a href="{% url 'core:profiles' %}">{% trans "My Projects" %}</a></li>
 
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "New...<span class="caret"></span></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "New" %}...<span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href="{% url 'publication:add_publication' %}">{% trans "New Publication" %}</a></li>
                 <li><a href="{% url 'publication:add_publication' %}">{% trans "New Project" %}</a></li>

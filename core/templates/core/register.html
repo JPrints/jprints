@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load i18n %}
 
 {% block title %} JPrints User Registration {% endblock %}
 
 {% block body_block %}
 
-    <h1>Welcome to JPrints</h1>
+    <h1>{% trans "Welcome to" %} JPrints</h1>
     {% if registered %}
         <h2>Registered</h2>
         Thank you for registering<br />
     {% else %}
         Register here: <br />
-        <form id="user_form" method="post" action="/jprints/register/"
+        <form id="user_form" method="post" action="{% url "core:register" %}"
             enctype="multipart/form-data">
             {% csrf_token %}
             {{ user_form.as_p }}

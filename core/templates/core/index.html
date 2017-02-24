@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load i18n %}
 
 {% block title %} JPrints CORE {% endblock %}
 
 {% block body_block %}
 
-    <h1>Welcome to JPrints</h1>
+    <h1>{% trans "Welcome to" %} JPrints</h1>
     {% if message %}
         <h2>{{ message }}</h2>
     {% endif %}

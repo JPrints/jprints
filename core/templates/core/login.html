@@ -6,11 +6,11 @@
 {% block body_block %}
 
     <h2>Login to JPrints</h2>
-    <form id="login_form" method="post" action="/jprints/login/">
+    <form id="login_form" method="post" action="{% url 'core:login' %}">
         {% csrf_token %}
-        Username: <input type="text" name="username" value="" size="50" />
+        <div style="width: 80px; display: inline-block">Username: </div><input type="text" name="username" value="" size="50" />
         <br />
-        Password: <input type="password" name="password" value="" size="50" />
+        <div style="width: 80px; display: inline-block">Password: </div><input type="password" name="password" value="" size="50" />
         <br />
         <input type="submit" name="submit" />
     </form>
