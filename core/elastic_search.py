@@ -93,6 +93,16 @@ def initialise_elastic_search():
                         }
                     }
                 },
+                #"fulltext" : {
+                #    "properties" : {
+                #        "title" : {
+                #            "type" : "text",
+                #        },
+                #        "thedata" : {
+                #            "type" : "text",
+                #        }
+                #    }
+                #},
                 "person" : {
                     "properties" : {
                         "userid" : {
@@ -361,11 +371,6 @@ def run_query( query ):
     results = []
     es = Elasticsearch()
     
-                                        #{ "match": { "body": query } },
-                                        #{ "match": { "milestone": query } },
-    #res = es.search(index='jprints', body={"query": {"match_all": { }}})
-
-
     query_from = 0
     query_size = 10
 
@@ -379,7 +384,7 @@ def run_query( query ):
     abstract_de_term  = { 'match': { 'abstract_de' : query } }
     filename_term  = { 'match': { 'filename' : query } }
     filedesc_term  = { 'match': { 'filedesc' : query } }
-    body_term  = { 'match': { 'body' : query } }
+    fulltext_term  = { 'match': { 'attachment.content' : query } }
 
     must_terms = {}
     should_terms = [
@@ -389,12 +394,10 @@ def run_query( query ):
         given_d_term,
         filename_term,
         filedesc_term,
-        body_term,
+        fulltext_term,
     ] 
     current_lang = get_language()
-    if current_lang:
-        print("Current language is:", current_lang )
-    else:
+    if not current_lang:
         current_lang = "en"
 
     if current_lang == "de":
@@ -412,10 +415,10 @@ def run_query( query ):
 
     highlight_fields_en = { "family": {}, "family_d": {}, "given": {},"given_d": {}, 
                             "title_en": {}, "abstract_en": {}, 
-                            "body": {}, "filename": {}, "filedesc": {}, }
+                            "attachment.content": {}, "filename": {}, "filedesc": {}, }
     highlight_fields_de = { "family": {},"family_d": {}, "given": {}, "given_d": {}, 
                             "title_de": {}, "abstract_de": {}, 
-                            "body": {}, "filename": {}, "filedesc": {}, }
+                            "attachment.content": {}, "filename": {}, "filedesc": {}, }
 
     if current_lang == "de":
         highlight_fields = { "fields": highlight_fields_de }
@@ -434,36 +437,8 @@ def run_query( query ):
 
     dsl = json.dumps( dslraw ) 
 
-    print( "run_query about to run \n\ndsl["+dsl+"]", 'formed from\n\n', dslraw );
+    #print( "run_query about to run \n\ndsl["+dsl+"]", 'formed from\n\n', dslraw );
     res = es.search(index='jprints', body=dsl)
-
-#    res = es.search(index='jprints', 
-#                     body={ 
-#                            "query": { 
-#                                "bool" :{
-#                                    "should": [
-#                                        { "match": { "family": query } },
-#                                        { "match": { "given": query } },
-#                                        { "match": { "title": query } },
-#                                        { "match": { "abstract": query } },
-#                                        { "match": { "filename": query } },
-#                                        { "match": { "filedesc": query } }
-#                                    ]
-#                                } 
-#                            },
-#                            "highlight": {
-#                                "fields": { 
-#                                    "family": {}, 
-#                                    "given": {}, 
-#                                    "title": {}, 
-#                                    "abstract": {},
-#                                    "body": {},
-#                                    "filename": {},
-#                                    "filedesc": {},
-#                                }
-#                            }
-#                        }   
-#                    )
 
     print("Got %d Hits:" % res['hits']['total'])
 
@@ -476,13 +451,18 @@ def run_query( query ):
         elif (hit_type == "publication"):
             obj = Publication.objects.get(pk=hit_id)
         elif (hit_type == "fulltext"):
-            obj = Document.objects.get(pk=hit_id)
+            id_match = re.match( "^(\d+)_(\d+)", str(hit_id) )
+            if id_match:
+                pub_id = id_match.group(1) 
+                doc_id = id_match.group(2) 
+                obj = Document.objects.get(pk=doc_id)
+                hit_id = doc_id
 
         highlight_title = ""
         highlight_abs = ""
         highlight_family = ""
         highlight_given = ""
-        highlight_body = ""
+        highlight_fulltext = ""
         highlight_filename = ""
         highlight_filedesc = ""
         if 'highlight' in hit:
@@ -505,8 +485,8 @@ def run_query( query ):
                     highlight_given = value
                 elif key == "given_d":
                     highlight_given = value
-                elif key == "body":
-                    highlight_body = value
+                elif key == "attachment.content":
+                    highlight_fulltext = value
                 elif key == "filename":
                     highlight_filename = value
                 elif key == "filedesc":
@@ -517,7 +497,7 @@ def run_query( query ):
                     'highlight_a': highlight_abs,
                     'highlight_f': highlight_family,
                     'highlight_g': highlight_given,
-                    'highlight_b': highlight_body,
+                    'highlight_b': highlight_fulltext,
                     'highlight_fn': highlight_filename,
                     'highlight_fd': highlight_filedesc,
                     'id': hit_id,
@@ -525,7 +505,7 @@ def run_query( query ):
                     'obj': obj,
                     })
 
-    print("elastic_search::run_query results: ["+'\n'.join(map(str, results))+"]")
+    #print("elastic_search::run_query results: ["+'\n'.join(map(str, results))+"]")
     return results
 
 def index_person( person ):
@@ -577,9 +557,6 @@ def index_publication( publication ):
     elif (publication.complete_date):
         milestone = publication.complete_date
 
-    my_str = "index_publication [%s] [%s] milestone[%s] called" % ( publication.id, publication.title, str(milestone) )
-    print (my_str)
-
     doc = {
        'id'         : publication.id,
        'depositor'  : publication.depositor.id,
@@ -606,29 +583,13 @@ def index_publication( publication ):
             b64_ascii = str( b64_text, 'ascii' )
             ingest_body = { "data": b64_ascii }
 
-            ##### works
-            #b64_text = base64.b64encode(b'this is my text')
-            #b64_ascii = str( b64_text, 'ascii' )
-            #print( b64_ascii )
-            #ingest_body = { "data": b64_ascii }
-            ##### end works
-
-            ##### works
-            #b64_text  = "e1xydGYxXGFuc2kNCkxvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0DQpccGFyIH0="
-            #ingest_body = { "data": b64_text }
-            ##### end works
-            ##### works
-            #ingest_body = { "data": "e1xydGYxXGFuc2kNCkxvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0DQpccGFyIH0=" }
-            ##### end works
-
             ingest_id = str(publication.id)+'_'+str(fulltext.id)
             ingest_url = 'http://localhost:9200/jprints/fulltext/'+ingest_id+'?pipeline=attachment'
             headers = { 'Content-Type': 'application/json' }
             ingest_res = requests.put( ingest_url, headers=headers, data=json.dumps(ingest_body) )
 
-            print("REAL INGEST RESULT !!!!!!!!!!!!!!!!! ", ingest_res.text)
         except FileNotFoundError:
-            print("############################### FILE NOT FOUND")
+            print("File not found for ingest")
 
 
 

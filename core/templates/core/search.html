@@ -19,7 +19,7 @@
             {% elif result.type == "fulltext" %}
                 <h4 class="list-group-item-heading">
                 <a href="{% url 'publication:detail' result.obj.publication.id %}">
-                    <img width="20px" height="20px" src="{% static 'images/' %}{{ result.obj.publication.get_icon_name }}" alt="icon" /> FULLTEXT {{ result.obj.publication.get_search_citation }}</a>
+                    <img width="20px" height="20px" src="{% static 'images/' %}{{ result.obj.publication.get_icon_name }}" alt="icon" /> {{ result.obj.publication.get_search_citation }}</a>
                 </h4> 
  
             {% elif result.type == "person" %}
