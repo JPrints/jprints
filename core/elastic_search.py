@@ -538,12 +538,35 @@ def index_person( person ):
     res = es.index( index='jprints', doc_type="person", id=person.id, body=doc ) 
     #print(res['created'])
  
+def rm_index_person( person ):
+    es = Elasticsearch()
+    #print( "rm_index_person called for id", person.id)
+    res = es.delete( index='jprints', doc_type="person", id=person.id ) 
+    #print(res)
+ 
+
+def rm_index_publication( publication ):
+    from publications.models import Publication, Document
+    es = Elasticsearch()
+
+    documents = Document.objects.filter(publication__id=publication.id)
+    for fulltext in documents:
+        if fulltext.filefield:
+            ingest_id = str(publication.id)+'_'+str(fulltext.id)
+            #print("rm_index_publicationi FULLTEXT ", "id", ingest_id );
+            res = es.delete( index='jprints', doc_type="fulltext", id=ingest_id ) 
+            #print(res)
+ 
+    #print("rm_index_publication", "id", publication.id );
+    res = es.delete( index='jprints', doc_type="publication", id=publication.id ) 
+    #print(res)
+
 
 def index_publication( publication ):
     from publications.models import Publication, Document
     es = Elasticsearch()
 
-    print("index_publication", "id", publication.id, "date",  publication.publication_date );
+    #print("index_publication", "id", publication.id, "date",  publication.publication_date );
 
     milestone = "1900-01-01"
     if (publication.publication_date):

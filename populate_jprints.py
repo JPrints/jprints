@@ -121,7 +121,7 @@ def populate_publications():
             "subject": "1",
             "divisions": "1",
             "publication_date": "2017-01-02",
-         },
+          },
         )
 
     for pub in test_pubs:
@@ -129,10 +129,8 @@ def populate_publications():
 
 def add_publication(pub):
     print("add publication: depositor {0} type {1} title {2}".format(str(pub["depositor"]), str(pub["publication_type"]), str(pub["title"])))
-    #print("add publication: date", str(pub["publication_date"]) )
     u = User.objects.get_or_create(username=pub["depositor"])[0]
     person = Person.objects.get_or_create(user=u)[0]
-    #print("add_publication called person", person.id,  "user", u.id )
     p = Publication.objects.get_or_create(depositor=person, title=pub["title"])[0]
     p.status = pub["status"]
     p.publication_type = pub["publication_type"]
@@ -146,22 +144,20 @@ def add_publication(pub):
     #p.accept_date = pub["accept_date"]
     #p.submit_date = pub["submit_date"]
     #p.complete_date = pub["complete_date"]
-    print("added publication:", "id", p.id, "date", p.publication_date )
 
     if ( "document" in pub ):
         d = Document.objects.get_or_create(publication=p)[0]
         d.save()
         src_path = settings.STATIC_DIR + "/testdoc/"+pub["document"]
-        doc_path = "/pub/"+str(p.id)+"/doc/"+str(d.id)+"/"
+        doc_path = "pub/"+str(p.id)+"/doc/"+str(d.id)+"/"
         doc_name = pub["document"]
-        dest_path = settings.MEDIA_DIR + doc_path
+        dest_path = settings.MEDIA_DIR +"/"+ doc_path
         os.makedirs(dest_path)
         shutil.copy(src_path, dest_path+doc_name)
         print("Pub doc", "src", src_path, "dest", dest_path)
         d.filefield.name = doc_path+doc_name
 
         d.save()
-        print("added DOCUMENT ", d.id, "to publication id", p.id, "file", d.filefield.name )
     p.save()
 
 def populate_people():
@@ -255,9 +251,10 @@ def add_user(user):
     p.save()
     if ( "photo" in user ):
         src_path = settings.STATIC_DIR + "/images/"+user["photo"]
-        photo_path = "/profile/"+str(p.id)+"/photo/"
+        photo_path = "profile/"+str(p.id)+"/photo/"
+        #photo_path = "/profile/"+str(p.id)+"/photo/"
         photo_name = "userphoto.png"
-        dest_path = settings.MEDIA_DIR + photo_path
+        dest_path = settings.MEDIA_DIR + "/" +photo_path
         os.makedirs(dest_path)
         shutil.copy(src_path, dest_path+photo_name)
         print("User photo", "src", src_path, "dest", dest_path)
@@ -272,17 +269,20 @@ def clear_database():
         print("About to delete publication ",publication.id,publication.title)
         publication.delete()
 
-    users = User.objects.order_by('id')
-    for user in users:
-        if user.is_staff != True:
-            print("deleting user ", user.id, user.last_name, user.is_staff)
-            user.delete()
-
     people = Person.objects.order_by('id')
     for person in people:
         if person.user_type != "Ad":
             print("deleting person ",person.id,person.disp_family)
             person.delete()
+        else:
+            print("Not deleting person ",person.id,person.disp_family)
+
+
+    users = User.objects.order_by('id')
+    for user in users:
+        if user.is_staff != True:
+            print("deleting user ", user.id, user.last_name, user.is_staff)
+            user.delete()
 
 
 if __name__ == '__main__':

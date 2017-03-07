@@ -125,7 +125,6 @@ class Publication(models.Model):
     def save(self, *args, **kwargs):
         super(Publication, self).save(*args, **kwargs) 
         index_publication( self )
-        print("Publication.save called index !!!!!", self.id, self.title)
 
     def get_publication_type_str(self):
         type = ""
