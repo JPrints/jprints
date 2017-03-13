@@ -7,10 +7,13 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 import re
+import json
 
 from core.forms import UserForm, PersonForm
 from core.elastic_search import run_query, run_filter, run_agg_filter
 from .models import Person
+from publications.citations import form_bibliography, get_styles, testcitation
+from publications.models import Publication, Document
 
 # Create your views here.
 
@@ -148,11 +151,9 @@ def filter(request, ftype, ffield ):
             }
     return render(request, 'core/filter.html', context )
 
-
 def browse(request, ftype ):
     result_list = []
 
-    print("BROWSE xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
     item_filter_terms = []
     pub_status_filter_terms = []
     status_filter_terms = []
@@ -161,8 +162,6 @@ def browse(request, ftype ):
     query_from = 0
     query_size = 10
     if request.method == 'POST':
-        print("BROWSE POST xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-
         for pr in request.POST.items():
             print("got post item", pr)
             next_btn = re.match( "^next_(?P<from>[0-9]+)_(?P<size>[0-9]+)", pr[0])
@@ -201,9 +200,14 @@ def browse(request, ftype ):
     qto = query_from + query_size
     if qto > int(total):
         qto = total
-    print("from", query_from, "to", qto, "total", total)
-    print("views.browse::result_list: ["+'\n'.join(map(str, result_list))+"]")
-#    print("views.browse::aggs_list: ["+'\n'.join(map(str, aggs_list))+"]")
+
+    export_list = ""
+    for res in result_list:
+        export_list += " "+res['id']
+
+    # citation export
+    cstyles = get_styles
+
     context = { 'result_list': result_list, 
                 'aggs_list': aggs_list,
                 'btype': ftype, 
@@ -211,8 +215,55 @@ def browse(request, ftype ):
                 'qto'  : qto,
                 'qsize': query_size,
                 'total': total,
+                'cstyles': cstyles,
+                'export_list': export_list,
             }
     return render(request, 'core/browse.html', context )
+
+
+def browse_bibliography(request, ftype ):
+    result_list = []
+    bib = []
+    cit_style = "harvard1"
+    export_list = ""
+
+    if request.method == 'POST':
+        cit_style = request.POST.get("bib_style", 'harvard1' )
+        print("style ", cit_style )
+        id_str = request.POST.get("result_list", None )
+        id_list = id_str.split()
+        json_data = "["
+
+        items = 0
+        for id in id_list:
+            export_list += " "+str(id)
+            print("process id", id)
+            try:
+                publication = Publication.objects.get(id=id)
+                pub_json = publication.get_json_citation()
+                if items < 1:
+                    json_data += pub_json;
+                else:
+                    json_data += ",";
+                    json_data += pub_json;
+                items = items + 1
+            except Publication.DoesNotExist:
+                print("publication", str(id), "Not Found") 
+
+        json_data += "]"
+
+        bib = form_bibliography( cit_style, json_data, id_list )
+
+    # citation export
+    cstyles = get_styles
+
+    context = { 'bib_list': bib, 
+                'bib_style': cit_style,
+                'export_list': export_list,
+                'btype': ftype, 
+                'cstyles': cstyles,
+            }
+    return render(request, 'core/bibliography.html', context )
 
 
 

@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
+import json
+
 from core.elastic_search import index_publication
 
 class Milestone(models.Model):
@@ -103,7 +105,6 @@ class Publication(models.Model):
     title = models.CharField(max_length=200, blank=True)
     abstract = models.TextField(blank=True)
 
-    #publication_date = models.DateField(null=True,auto_now=False,auto_now_add=False,blank=True)
     publication_date = models.DateField(auto_now=False,auto_now_add=False,blank=True)
     online_date = models.DateField(null=True,auto_now=False,auto_now_add=False,blank=True)
     accept_date = models.DateField(null=True,auto_now=False,auto_now_add=False,blank=True)
@@ -156,8 +157,42 @@ class Publication(models.Model):
                 return n
         return disp
 
+    def get_json_citation(self):
+        authors = []
+        authors.append( { "family": "Grignon", "given": "Cyril" })
+        citation = { 
+            'id': str(self.id),
+            'title': self.title,
+            'type': self.get_publication_type_str(),
+            'author': authors,
+            'publisher-place': "London",
+            'publisher': "A Publisher",
+            'URL': "http://publisher.id",
+            'page': "120-124"
+        }
+
+        if self.publication_date:
+            cit_issued_date_val = []
+            cit_issued_date_val.append(self.publication_date.year)
+            if self.publication_date.month:
+                cit_issued_date_val.append( self.publication_date.month )
+            if self.publication_date.day:
+                cit_issued_date_val.append( self.publication_date.day )
+            cit_issued_date = []
+            cit_issued_date.append(cit_issued_date_val)
+        
+            cit_issued = { "date-parts": cit_issued_date }
+            citation['issued'] = cit_issued
+
+        return json.dumps( citation ) 
+
+
     def __str__(self):
         return '%s %s' % (self.id, self.title)
+
+
+
+
 
 class Document(models.Model):
 

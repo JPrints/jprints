@@ -2,11 +2,27 @@
 {% load i18n %}
 {% load staticfiles %}
 
-{% block title %} Search {% endblock %}
+{% block title %} Browse {% endblock %}
 
 {% block body_block %}
     <div> 
-    <h3>Browse {{btype}}</h3>
+    <h3>{% trans "Browse" %} {{btype}}</h3>
+    {% if btype == 'publication' %}
+    <div style="float:right;">
+	<form id="bibliograpy_form" method="post" action="{% url "core:bibliograpy" btype %}" >
+            {% csrf_token %}
+	    <input type='hidden' name='result_list' value="{{export_list}}" />
+            <select id="bib_style_sel", name="bib_style">
+              {% for csl in cstyles %}
+              <option value="{{csl}}">{{csl}}</option>
+              {% endfor %}
+            </select>
+	    <br/>
+            <input class="btn" type="submit" name="export" value="{% trans "View as Bibliography" %}" />
+        </form>
+
+    </div>
+    {% endif %}
     {% if aggs_list %}
         <div class="list-group">
 
@@ -87,7 +103,7 @@
 
         </div>
     {% else %}
-        <p>There are no aggs in this view</p>
+        <p>{% trans "There are no filters for this view" %}</p>
     {% endif %}
  
     {% if result_list %}
@@ -117,7 +133,7 @@
         {% endfor %}
         </div>
     {% else %}
-        <p>There are currently no items in this view</p>
+        <p>{% trans "There are currently no items in this view" %}</p>
     {% endif %}
     </div>
 {% endblock %}

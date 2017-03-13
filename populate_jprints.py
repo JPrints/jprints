@@ -11,6 +11,7 @@ from core.elastic_search import initialise_elastic_search, initialise_pipeline, 
 from django.contrib.auth.models import User
 from core.models import Person, Role, Permission
 from publications.models import Publication, Document
+from publications.citations import testcitation
 
 def populate_publications():
 
@@ -303,5 +304,7 @@ if __name__ == '__main__':
     #run_filter( "publication", "item_type", "B" )
     #run_agg_filter( "publication", {}, {} )
     #run_agg_filter( "person", {}, {} )
+
+    testcitation()
 
     print("Finished JPrints population script")

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block title %} Bibliography {% endblock %}
+
+{% block body_block %}
+    <div> 
+    <h3>{% trans "Bibliography for" %} {{btype}}</h3>
+    {% if btype == 'publication' %}
+        <div style="float:right;">
+	        <form id="bibliograpy_form" method="post" action="{% url "core:bibliograpy" btype %}" >
+                {% csrf_token %}
+	            <input type='hidden' name='result_list' value="{{export_list}}" />
+                <select id="bib_style_sel" name="bib_style">
+                    {% for csl in cstyles %}
+                        <option value="{{csl}}"
+                        {% if csl == bib_style %}
+                              selected
+                        {% endif %}
+                        >{{csl}}
+                        </option>
+                    {% endfor %}
+                </select>
+	            <br/>
+                <input class="btn" type="submit" name="export" value="{% trans "Select format" %}" />
+            </form>
+        </div>
+    {% endif %}
+ 
+ <br/>
+    {% if bib_list %}
+        <div style="clear:both;" class="list-group">
+        {% for result in bib_list %}
+            <div class="list-group-item">
+                <h4 class="list-group-item-heading">
+                {{result}}
+                </h4> 
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p>{% trans "There are currently no items in this bibliography" %}</p>
+    {% endif %}
+    </div>
+{% endblock %}
+
