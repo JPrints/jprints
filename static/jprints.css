@@ -25,3 +25,35 @@ body {
 
 }
 
+
+/* publication edit */
+.pub_accordian {
+   width: 600px;
+}
+
+.pub_accordian_label {
+    float: right;
+    padding-right: 10px;
+} 
+.pub_accordian_val {
+    padding-left: 10px;
+} 
+
+
+.contrib_title_input {
+  border-radius: 4px 0 0 4px;
+}
+
+.contrib_results {
+   background-color: aliceblue;
+}
+
+
+.journal_results {
+   background-color: aliceblue;
+}
+
+
+
+
+

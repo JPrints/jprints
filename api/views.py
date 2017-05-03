@@ -25,10 +25,11 @@ def lookup_person(request):
     if len(family) > 0:
         q = q.filter(disp_family__icontains=family)
     if len(orcid) > 0:
-        q = q.filter(orcid__startswith=orcid)
+        q = q.filter(orcid__icontains=orcid)
     for person in q:
         person_data.append(
             {
+                'id': person.id,
                 'title': person.disp_title,
                 'given': person.disp_given,
                 'family': person.disp_family,

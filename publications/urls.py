@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^add_publication/$', views.add_publication, name='add_publication'),
     url(r'^edit/(?P<pubid>[0-9]+)/$', views.edit_publication, name='edit_publication'),
     url(r'^add_doc/(?P<pubid>[0-9]+)/$', views.add_doc, name='add_document'),
+    url(r'^add_contrib/(?P<personid>[0-9]+)/$', views.add_contributor, name='add_contributor'),
 ]
 
 

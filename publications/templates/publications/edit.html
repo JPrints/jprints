@@ -3,38 +3,237 @@
 
 {% block title %} JPrints Edit publication {% endblock %}
 
+{% block static_files %}
+    <script src="{% static 'js/publication.js' %}"></script>
+{% endblock %}
+
 {% block body_block %}
 
     <h1>Edit Publication Data</h1>
 
-        <table>
-            <tr><th>Id:</th><td>{{pub.id}}</td>
-            <tr><th>Title:</th><td>{{pub.title}}</td>
-        </table>
-        <form id="pub_form" method="post" action="/pub/edit/{{pub.id}}/"
+        <form id="pub_form" class= "pub_input" method="post" action="{% url 'publication:edit_publication' pub.id %}"
             enctype="multipart/form-data">
             {% csrf_token %}
             <table>
-                {{ pub_form.as_table }}
+                <tr><th>Id:</th><td>{{pub.id}}</td>
+                <tr><th>Title:</th><td>{{pub.title}}</td>
             </table>
+
+            <div id=feedback class="pub_feedback">
+                <h3>Current status</h3>
+                <div id=pub_feedback_data>data</div>
+            </div>
+
+	        <!-- Accordion -->
+            <div id="accordion" class="pub_accordian">
+	            <h3>Core Fields</h3>
+	            <div>
+		            <div class="fieldWrapper">
+                        <table>
+                            <tr><td colspan="2"> {{ pub_form.depositor.errors }} </td></tr>
+                            <tr><td class="pub_accordian_label"> <label for="{{ pub_form.depositor.id_for_label }}">Depositor:</label> </td>
+                                <td class="pub_accordian_val"> {{ pub_form.depositor}} </td></tr>
+
+    	        	        <tr><td colspan="2"> {{ pub_form.publication_type.errors }}</td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.publication_type.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.publication_type}}</td></tr>
+    	        	        <tr><td colspan="2"> {{ pub_form.title.errors }}</td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.title.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.title}}</td></tr>
+    	        	        <tr><td colspan="2"> {{ pub_form.abstract.errors }}</td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.abstract.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.abstract}}</td></tr>
+
+                        </table>
+
+
+                        <div class="contributors">
+            		    <label id="contrib_list" for="{{ pub_form.contributors.id_for_label }}">Contributors:</label>
+                            {{ pub_form.contributors.errors }}
+                            <div class="contrib_added_row">
+                                <ol id="contribs_to_add">
+                                </ol>
+                            </div>
+                            <div class="contrib_row">
+                                <input type="hidden" name="contrib_count" id="contrib_count" value=0 />
+                                <div id="field">
+                                    <input class="contrib_input" id="contrib_t" name="contrib_t" type="text" placeholder="Title" />
+                                    <input class="contrib_input" id="contrib_g" name="contrib_g" type="text" placeholder="Given name" />
+                                    <input class="contrib_input" id="contrib_f" name="contrib_f" type="text" placeholder="Family name" />
+                                    <input class="contrib_input" id="contrib_o" name="contrib_o" type="text" placeholder="Orcid" />
+                                    <button id="b1" class="btn add-contributor" type="button">+</button>
+                                    <br/>
+                                    <div id="found_contribs_div" class="contrib_results"></div>
+                                    <small>Press + to add the contributor</small>
+                                </div>
+                            </div>
+                        </div>
+		            </div>
+	            </div>
+	            <h3>Subjects</h3>
+                <div>
+		            <div class="fieldWrapper">
+                        <table>
+                            <tr><td colspan="2"> {{ pub_form.subject.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.subject.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.subject}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.divisions.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.divisions.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.divisions}}</td></tr>
+                        </table>
+		            </div>
+	            </div>
+	            <h3>Dates</h3>
+	            <div>
+		            <div class="fieldWrapper">
+                        <table>
+                            <tr><td colspan="2"> {{ pub_form.publication_date.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.publication_date.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.publication_date}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.online_date.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.online_date.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.online_date}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.accept_date.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.accept_date.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.accept_date}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.submit_date.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.submit_date.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.submit_date}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.complete_date.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.complete_date.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.complete_date}}</td></tr>
+                        </table>
+		            </div>
+	            </div>
+	            <h3>Other Fields</h3>
+	            <div>
+		            <div class="fieldWrapper">
+                        <table>
+                            <tr><td colspan="2"> {{ pub_form.keywords.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.keywords.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.keywords}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.notes.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.notes.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.notes}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.suggestions.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.suggestions.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.suggestions}}</td></tr>
+                        </table>
+		            </div>
+	            </div>
+	            <h3>Journal Fields</h3>
+	            <div>
+		            <div class="fieldWrapper">
+                        <table>
+                            <tr><td colspan="2"> {{ pub_form.journal.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.journal.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.journal}}
+                                    <div id="found_journals_div" class="journal_results"></div>
+                                </td>
+				            </tr>
+                            <tr><td colspan="2"> {{ pub_form.volume.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.volume.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.volume}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.issue.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.issue.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.issue}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.issn_e.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.issn_e.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.issn_e}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.issn_p.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.issn_p.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.issn_p}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.issn_l.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.issn_l.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.issn_l}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.pages.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.pages.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.pages}}</td></tr>
+                        </table>
+		            </div>
+	            </div>
+	            <h3>Book Fields</h3>
+	            <div>
+		            <div class="fieldWrapper">
+                        <table>
+                            <tr><td colspan="2"> {{ pub_form.book_series.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.book_series.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.book_series}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.book_title.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.book_title.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.book_title}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.pagerange.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.pagerange.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.pagerange}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.isbn.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.isbn.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.isbn}}</td></tr>
+                        </table>
+		            </div>
+	            </div>
+	            <h3>Publisher Fields</h3>
+	            <div>
+		            <div class="fieldWrapper">
+                        <table>
+                            <tr><td colspan="2"> {{ pub_form.publisher.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.publisher.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.publisher}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.place_of_pub.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.place_of_pub.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.place_of_pub}}</td></tr>
+                        </table>
+		            </div>
+	            </div>
+	            <h3>IDs</h3>
+	            <div>
+		            <div class="fieldWrapper">
+                        <table>
+                            <tr><td colspan="2"> {{ pub_form.doi.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.doi.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.doi}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.pubmedid.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.pubmedid.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.pubmedid}}</td></tr>
+                            <tr><td colspan="2"> {{ pub_form.wosid.errors }} </td></tr>
+		                    <tr><td class="pub_accordian_label"> {{ pub_form.wosid.label_tag }}</td>
+                                <td class="pub_accordian_val"> {{ pub_form.wosid}}</td></tr>
+                        </table>
+		            </div>
+	            </div>
+	        </div>
+
+            {% for hidden in pub_form.hidden_fields %}
+            {{ hidden }}
+            {% endfor %}
+
+
+
+<!-- Autocomplete -->
+<h2 class="demoHeaders">Autocomplete</h2>
+<div>
+	<input id="autocomplete" title="type &quot;a&quot;">
+</div>
+
             <input type="submit" name="submit" value="Save" />
         </form>
-            <table>
+        <table>
             <tr>
                 <td>
-                    <form id="pub_add_doc_form" method="get" action="/pub/add_doc/{{pub.id}}/">
+                    <form id="pub_add_doc_form" method="get" action="{% url 'publication:add_document' pub.id %}">
                         {% csrf_token %}
                         <input type="submit" name="submit" value="Add a document" />
                     </form>
                 </td>
                 <td>
-                    <form id="pub_add_contrib_form" method="get" action="/pub/add_contrib/{{pub.id}}/">
+                    <form id="pub_add_contrib_form" method="get" action="{% url 'publication:add_contributor' pub.id %}">
                         {% csrf_token %}
                         <input type="submit" name="submit" value="Add a contributor" />
                     </form>
                 </td>
             </tr>
         </table>
- 
+
+
+
 {% endblock %}
 

@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 from .models import Publication, Document
 #from publications.forms import PublicationFormAdmin
-from publications.forms import PublicationFormAdmin, PublicationFormDepositor, PublicationFormAddDoc
+from publications.forms import PublicationForm, PublicationFormAddDoc
 
 import logging
 
@@ -27,14 +27,14 @@ def add_publication(request):
 
     logger = logging.getLogger('jprints')
     person = request.user.person
-    form = PublicationFormDepositor( person )
+    form = PublicationForm()
 
     if (person.user_type == "Ad"):
-        form = PublicationFormAdmin()
+        #form = PublicationForm()
         logger.info("Person is admin")
     else:
         #form = PublicationFormAdmin(request.POST)
-        form = PublicationFormDepositor( person )
+        #form = PublicationForm()
         logger.info("Person is NOT admin")
 
     if request.method == 'POST':
@@ -60,27 +60,33 @@ def add_publication(request):
 def edit_publication(request, pubid):
 
     if request.method == 'POST':
-        print("edit_profile called, POST param is", pubid) 
+        print("##############edit_publication called, POST param is", pubid) 
         pub_orig = Publication.objects.get(pk=pubid)
         print("edit_publication pub is", pub_orig) 
 
-        pub_form = PublicationFormAdmin(data=request.POST, instance=pub_orig)
+        pub_form = PublicationForm(data=request.POST, instance=pub_orig)
 
         if pub_form.is_valid():
             pub = pub_form.save()
+            # get any new contributors
+            contrib_count = request.POST.get("contrib_count", 0)
+            print("##############edit_publication called contrib_count is", contrib_count)
+
+
+
             #if 'photo' in request.FILES:
             #    person.photo = request.FILES['photo']
             pub.save()
             return detail(request, pubid)
         else:
             print(pub_form.errors)
-            context = { 'pub': pub, 'pub_form': pub_form }
+            context = { 'pub': pub_orig, 'pub_form': pub_form }
             return render(request, 'publications/edit.html', context)
 
     else: 
-        print("edit_profile called, GET param is", pubid) 
+        print("##############edit_publication called, GET param is", pubid) 
         pub = Publication.objects.get(pk=pubid)
-        form = PublicationFormAdmin(instance=pub)
+        form = PublicationForm(instance=pub)
         context = { 'pub': pub, 'pub_form': form }
         return render(request, 'publications/edit.html', context)
 
@@ -114,6 +120,44 @@ def add_doc(request, pubid):
             print(doc_form.errors)
             context = { 'pub': pub, 'doc_form': doc_form }
             return render(request, 'publications/add_doc.html', context)
+
+    else: 
+        print("add_doc called, GET param is", pubid) 
+        pub = Publication.objects.get(pk=pubid)
+        form = PublicationFormAddDoc(instance=pub)
+        context = { 'pub': pub, 'doc_form': form }
+        return render(request, 'publications/add_doc.html', context)
+
+@login_required
+def add_contributor(request, personid):
+
+    logger = logging.getLogger('jprints')
+    logger.info("add_contributor called ")
+
+    if request.method == 'POST':
+        #person = Publication.objects.get(pk=personid)
+        logger.info("request is POST")
+        #print("add_doc pub is", pub) 
+
+        #doc_form = PublicationFormAddDoc(data=request.POST)
+
+        #doc_is_valid = doc_form.is_valid()
+        #print("doc is valid ["+str(doc_is_valid)+"]")
+        #if doc_form.is_valid():
+        #    doc = doc_form.save(commit=False)
+        #    doc.publication = pub
+        #    doc.save()
+
+        #    print("GOT DOCUMENT!!!!! "+str(request.FILES))
+        #    if 'filefield' in request.FILES:
+        #        print("GOT DOCUMENT!!!!! "+str(request.FILES))
+        #        doc.filefield = request.FILES['filefield']
+        #    doc.save()
+        #    return detail(request, personid)
+        #else:
+        #    print(doc_form.errors)
+        #    context = { 'pub': pub, 'doc_form': doc_form }
+        return render(request, 'publications/add_doc.html', context)
 
     else: 
         print("add_doc called, GET param is", pubid) 

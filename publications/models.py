@@ -17,20 +17,6 @@ class Milestone(models.Model):
     date = models.DateTimeField()
     milestone_type = models.CharField(max_length=1, choices=MILESTONE_TYPES)
 
-class Contributor(models.Model):
-    from core.models import Person
-
-    CONTRIBUTION_TYPES = (
-        ( 'Au', _('Author') ),
-        ( 'Ed', _('Editor') ),
-        ( 'Ad', _('Advisor') ),
-        ( 'Re', _('Referee') ),
-        ( 'Tr', _('TRANSLATOR') ),
-    )
- 
-    contribution_type = models.CharField(max_length=2, choices=CONTRIBUTION_TYPES)
-    person = models.ForeignKey(Person)
-
 DOCUMENT_TYPES = (
         ( 'dra', _('draft') ),
         ( 'sub', _('submitted') ),
@@ -97,6 +83,7 @@ class Publication(models.Model):
 
     # metadata fields
     depositor = models.ForeignKey(Person)
+    contributors = models.ManyToManyField(Person, related_name='contributes_to', through='Contributor')
 
     status = models.CharField(max_length=1, choices=STATUS_TYPES, default='I')
     publication_type = models.CharField(max_length=1, choices=PUBLICATION_TYPES, default='A')
@@ -114,6 +101,26 @@ class Publication(models.Model):
     subject = models.CharField(max_length=200, blank=True)
     divisions = models.CharField(max_length=200, blank=True)
     
+    keywords = models.TextField(blank=True)
+    notes = models.TextField(blank=True)
+    suggestions = models.TextField(blank=True)
+    book_series = models.CharField(max_length=200, blank=True)
+    journal = models.CharField(max_length=200, blank=True)
+    volume = models.CharField(max_length=200, blank=True)
+    issue = models.CharField(max_length=200, blank=True)
+    publisher = models.CharField(max_length=200, blank=True)
+    place_of_pub = models.CharField(max_length=200, blank=True)
+    pagerange = models.CharField(max_length=200, blank=True)
+    pages = models.CharField(max_length=200, blank=True)
+    issn_e = models.CharField(max_length=200, blank=True)
+    issn_p = models.CharField(max_length=200, blank=True)
+    issn_l = models.CharField(max_length=200, blank=True)
+    isbn = models.CharField(max_length=200, blank=True)
+    book_title = models.CharField(max_length=200, blank=True)
+    doi = models.CharField(max_length=200, blank=True)
+    pubmedid = models.CharField(max_length=200, blank=True)
+    wosid = models.CharField(max_length=200, blank=True)
+
     revision = models.IntegerField(default=1, editable=False)
     created = models.DateTimeField(auto_now_add=True, )
     #created = models.DateTimeField(auto_now_add=True, default=timezone.now(), editable=False)
@@ -209,6 +216,22 @@ class Document(models.Model):
     filefield = models.FileField(upload_to=pub_doc_path, blank=True)
 
 
+
+class Contributor(models.Model):
+    from core.models import Person
+
+    CONTRIBUTION_TYPES = (
+        ( 'Au', _('Author') ),
+        ( 'Ed', _('Editor') ),
+        ( 'Ad', _('Advisor') ),
+        ( 'Re', _('Referee') ),
+        ( 'Tr', _('TRANSLATOR') ),
+    )
+ 
+    contribution_type = models.CharField(max_length=2, choices=CONTRIBUTION_TYPES)
+    person = models.ForeignKey(Person)
+    publication = models.ForeignKey(Publication, on_delete=models.CASCADE)
+    number = models.PositiveIntegerField(default=1)
 
 
 
