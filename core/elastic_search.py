@@ -566,7 +566,7 @@ def index_publication( publication ):
     from publications.models import Publication, Document
     es = Elasticsearch()
 
-    #print("index_publication", "id", publication.id, "date",  publication.publication_date );
+    print("index_publication", "id", publication.id, "date",  publication.publication_date );
 
     milestone = "1900-01-01"
     if (publication.publication_date):
@@ -599,7 +599,7 @@ def index_publication( publication ):
     documents = Document.objects.filter(publication__id=publication.id)
     for fulltext in documents:
         try:
-            doc_path = settings.MEDIA_DIR + fulltext.filefield.name
+            doc_path = settings.MEDIA_DIR + "/" + fulltext.filefield.name
             doc_text = parser.from_file(doc_path) 
 
             b64_text = base64.b64encode(doc_text['content'].encode("utf-8"))

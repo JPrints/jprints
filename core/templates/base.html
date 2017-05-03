@@ -17,6 +17,11 @@
     <!-- Bootstrap core CSS -->
     <link href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet"> 
 
+    <!-- jquery ui CSS -->
+    <link href="{% static 'jquery/jquery-ui-1.12.1.custom/jquery-ui.css' %}" rel="stylesheet"> 
+    <link href="{% static 'jquery/jquery-ui-1.12.1.custom/jquery-ui.structure.css' %}" rel="stylesheet"> 
+    <link href="{% static 'jquery/jquery-ui-1.12.1.custom/jquery-ui.theme.css' %}" rel="stylesheet"> 
+
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="{% static 'bootstrap/dist/assets/css/ie10-viewport-bug-workaround.css' %}" rel="stylesheet">
 
@@ -141,7 +146,13 @@
     <script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js" integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB" crossorigin="anonymous"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="{% static 'bootstrap/dist/assets/js/ie10-viewport-bug-workaround.js'></script>
+    <script src="{% static 'bootstrap/dist/assets/js/ie10-viewport-bug-workaround.js' %}"></script>
+    <!-- jquery -->
+    <script src="{% static 'jquery/jquery-3.2.0.js' %}"></script>
+    <script src="{% static 'jquery/jquery-ui-1.12.1.custom/jquery-ui.js' %}"></script>
+
+    {% block static_files %}{% endblock %}
+
   </body>
 </html>
 
