@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.views import generic
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -90,15 +90,18 @@ def profile(request):
 @login_required
 def edit_profile(request, profileid):
 
+    print("edit_profile called method is", request.method )
     if request.method == 'POST':
         print("edit_profile called, POST param is", profileid) 
         person_orig = Person.objects.get(pk=profileid)
-        print("edit_profile person is", person_orig) 
+        print("edit_profile person is", person_orig, "dept is", person_orig.dept) 
 
         person_form = PersonForm(data=request.POST, instance=person_orig)
 
         if person_form.is_valid():
+            print("person form is valid", "about to save")
             person = person_form.save()
+            print("person form is valid", "saved", "dept is", person.dept )
             if 'photo' in request.FILES:
                 person.photo = request.FILES['photo']
             person.save()
