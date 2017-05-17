@@ -48,9 +48,15 @@
 
 
                         <div class="contributors">
-            		    <label id="contrib_list" for="{{ pub_form.contributors.id_for_label }}">Contributors:</label>
+			    <div style="float: left;">
+            		       <label id="contrib_list" for="{{ pub_form.contributors.id_for_label }}">Contributors:</label>
+			    </div>
+			    <div style="float: right;">
+			       <button type="button" class="btn btn-default btn-sm sort-contributors" ><span class="glyphicon glyphicon-sort"></span></button>
+			       <button type="button" class="btn fix-contributors" disabled><span class="glyphicon glyphicon-lock"></span></button>
+			    </div>
                             {{ pub_form.contributors.errors }}
-                            <div class="contrib_added_row">
+                            <div class="contrib_added_row" style="clear: both;">
                                 <ol id="contribs_to_add">
                                 </ol>
                             </div>

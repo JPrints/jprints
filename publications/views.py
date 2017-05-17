@@ -4,11 +4,14 @@ from django.urls import reverse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
 
-from .models import Publication, Document
+from core.models import Person, Role, Permission
+from .models import Publication, Document, Contributor
+
 #from publications.forms import PublicationFormAdmin
 from publications.forms import PublicationForm, PublicationFormAddDoc
 
 import logging
+import re
 
 
 def index(request):
@@ -19,7 +22,11 @@ def index(request):
 def detail(request, pk):
     publication = get_object_or_404(Publication, id=pk)
     documents = Document.objects.filter(publication__id=pk)
-    context = { 'publication': publication, 'publication_id': pk, 'documents': documents }
+    print("\n\n\n############# Detail ################");
+    contributors = Contributor.objects.filter(publication=publication);
+    print("contributors", contributors);
+
+    context = { 'publication': publication, 'publication_id': pk, 'documents': documents, 'contributors':contributors }
     return render(request, 'publications/detail.html', context)
 
 @login_required
@@ -58,6 +65,7 @@ def add_publication(request):
 
 @login_required
 def edit_publication(request, pubid):
+    from .models import Contributor
 
     if request.method == 'POST':
         print("##############edit_publication called, POST param is", pubid) 
@@ -70,9 +78,25 @@ def edit_publication(request, pubid):
             pub = pub_form.save()
             # get any new contributors
             contrib_count = request.POST.get("contrib_count", 0)
-            print("##############edit_publication called contrib_count is", contrib_count)
+            contribs = {}
+            req_items = request.POST.items();
+            # create a dict for each position
 
+            for req_item in req_items:
+                m = re.match( r"contrib_entry_(\w+)_(\d+)" , req_item[0] )
+                if m and m.group(1) and m.group(2):
+                    print("process item", req_item[0], req_item[1], m.group(1), m.group(2) )
+                    if m.group(2) not in contribs:
+                        contribs[ m.group(2) ] = {};
+                    contribs[ m.group(2) ][m.group(1)] = req_item[1];
 
+            print("##############edit_publication called contribs", contribs )
+            for id, contrib in contribs.items():
+                print( id, contrib )
+                p = Person.objects.get(pk=contrib['i'])
+                contrib_type = 'Au'
+                contributor = Contributor(person=p, contribution_type = contrib_type, number = contrib['p'], publication=pub )
+                contributor.save()
 
             #if 'photo' in request.FILES:
             #    person.photo = request.FILES['photo']

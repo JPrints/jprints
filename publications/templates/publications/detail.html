@@ -31,6 +31,18 @@
                 <td>Abstract</td><td>{{ publication.abstract}}</td>
             </tr>
             <tr>
+                <td>Conributors</td>
+                <td>
+                    <ol>
+                    {% for c in contributors %}
+                        <li>{{c.number}}. {{ c.person.disp_title }} {{ c.person.disp_given }} {{ c.person.disp_family }} {{ c.person.orcid }}
+                            ({{ c.contribution_type }})</li> 
+                    {% endfor %}
+                    </ol>
+                </td>
+            </tr>
+ 
+            <tr>
                 <td>Subjects</td><td>{{ publication.subject}}</td>
             </tr>
             <tr>

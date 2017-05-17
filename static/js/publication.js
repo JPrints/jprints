@@ -87,15 +87,17 @@ $(document).on('click', ".sel-contributor", function(e){
 	}
 
 	var next = Number(count) + 1;
+	var pVal = next.toString();
 	var contribList = "#contribs_to_add";
 	var newEntry = '<li id="contrib_entry_'+ next.toString() +'">'+entry;
         newEntry += ' <button id="removeContrib_' + next.toString() + '" class="btn btn-danger remove-contributor" >-</button>';
         newEntry += '</li>';
-	var i_hidden = '<input type="hidden" name="contrib_entry_i_'+next.toString()+'" id="contrib_entry_i_'+next.toString()+'" value='+iVal+' />'
-	var t_hidden = '<input type="hidden" name="contrib_entry_t_'+next.toString()+'" id="contrib_entry_t_'+next.toString()+'" value='+tVal+' />'
-	var g_hidden = '<input type="hidden" name="contrib_entry_g_'+next.toString()+'" id="contrib_entry_g_'+next.toString()+'" value='+gVal+' />'
-	var f_hidden = '<input type="hidden" name="contrib_entry_f_'+next.toString()+'" id="contrib_entry_f_'+next.toString()+'" value='+fVal+' />'
-	var o_hidden = '<input type="hidden" name="contrib_entry_o_'+next.toString()+'" id="contrib_entry_o_'+next.toString()+'" value='+oVal+' />'
+	var p_hidden = '<input type="hidden" name="contrib_entry_p_'+pVal+'" id="contrib_entry_p_'+pVal+'" value='+pVal+' />'
+	var i_hidden = '<input type="hidden" name="contrib_entry_i_'+pVal+'" id="contrib_entry_i_'+pVal+'" value='+iVal+' />'
+	var t_hidden = '<input type="hidden" name="contrib_entry_t_'+pVal+'" id="contrib_entry_t_'+pVal+'" value='+tVal+' />'
+	var g_hidden = '<input type="hidden" name="contrib_entry_g_'+pVal+'" id="contrib_entry_g_'+pVal+'" value='+gVal+' />'
+	var f_hidden = '<input type="hidden" name="contrib_entry_f_'+pVal+'" id="contrib_entry_f_'+pVal+'" value='+fVal+' />'
+	var o_hidden = '<input type="hidden" name="contrib_entry_o_'+pVal+'" id="contrib_entry_o_'+pVal+'" value='+oVal+' />'
 
 	$("#contrib_t").val("");
 	$("#contrib_g").val("");
@@ -104,6 +106,7 @@ $(document).on('click', ".sel-contributor", function(e){
 	$("#contribs_found").remove();
 
 	$(contribList).append(newEntry);
+	$(contribList).append(p_hidden);
 	$(contribList).append(i_hidden);
 	$(contribList).append(t_hidden);
 	$(contribList).append(g_hidden);
@@ -178,6 +181,40 @@ $('.contrib_input').keyup(function(){
 		alert("contriblookup ERROR" + errorThrown);
    	});
 });
+
+//
+// sort contributors toggle
+//
+$(document).ready(function(){
+    $(".sort-contributors").click(function(e){
+        e.preventDefault();
+	var contribList = "#contribs_to_add";
+	$(contribList).sortable({
+		stop: function( event, ui ) {
+			var sorted = this.sortable( "toArray" );
+alert( "sorting stopped: "+sorted);
+		}
+	});
+	$(contribList).sortable( "option", "disabled", false );
+	$(".sort-contributors").prop('disabled', true);
+	$(".fix-contributors").prop('disabled', false);
+
+    });
+    
+});
+
+$(document).ready(function(){
+    $(".fix-contributors").click(function(e){
+        e.preventDefault();
+	var contribList = "#contribs_to_add";
+	$(contribList).sortable( "option", "disabled", true );
+	$(".sort-contributors").prop('disabled', false);
+	$(".fix-contributors").prop('disabled', true);
+
+    });
+    
+});
+
 
 
 
