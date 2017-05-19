@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 
 from core.models import Person, Role, Permission
 from .models import Publication, Document, Contributor
@@ -23,7 +24,7 @@ def detail(request, pk):
     publication = get_object_or_404(Publication, id=pk)
     documents = Document.objects.filter(publication__id=pk)
     print("\n\n\n############# Detail ################");
-    contributors = Contributor.objects.filter(publication=publication);
+    contributors = Contributor.objects.filter(publication=publication).order_by('number');
     print("contributors", contributors);
 
     context = { 'publication': publication, 'publication_id': pk, 'documents': documents, 'contributors':contributors }
@@ -65,13 +66,14 @@ def add_publication(request):
 
 @login_required
 def edit_publication(request, pubid):
+    from random import randint
+    from django.contrib.auth.models import User
+    from core.models import Person, Role, Permission
     from .models import Contributor
 
     if request.method == 'POST':
         print("##############edit_publication called, POST param is", pubid) 
         pub_orig = Publication.objects.get(pk=pubid)
-        print("edit_publication pub is", pub_orig) 
-
         pub_form = PublicationForm(data=request.POST, instance=pub_orig)
 
         if pub_form.is_valid():
@@ -85,17 +87,36 @@ def edit_publication(request, pubid):
             for req_item in req_items:
                 m = re.match( r"contrib_entry_(\w+)_(\d+)" , req_item[0] )
                 if m and m.group(1) and m.group(2):
-                    print("process item", req_item[0], req_item[1], m.group(1), m.group(2) )
                     if m.group(2) not in contribs:
                         contribs[ m.group(2) ] = {};
                     contribs[ m.group(2) ][m.group(1)] = req_item[1];
+            #delete existing contributors
+            Contributor.objects.filter(publication=pub).delete();
 
-            print("##############edit_publication called contribs", contribs )
             for id, contrib in contribs.items():
                 print( id, contrib )
-                p = Person.objects.get(pk=contrib['i'])
+                person = None
+                try:
+                    person = Person.objects.get(pk=contrib['i'])
+                except ObjectDoesNotExist:
+                    username = contrib['f']+str(randint(1,10000))
+                    print("USERNAME", username);
+                    u = User.objects.get_or_create(username=username, email="", first_name=contrib['g'], last_name=contrib['f'])[0]
+                    u.save()
+                    person = Person.objects.get_or_create(user=u)[0]
+                    person.disp_title = contrib['t']
+                    person.disp_given = contrib['g']
+                    person.disp_family = contrib['f']
+                    person.lang = "EN"
+                    person.orcid = contrib['o']
+                    person.user_type = 'Ex'
+                    person.save()
+ 
+                    print("PERSON DOES NOT EXIST", contrib['i']);
+                if person is None:
+                    print("NO PERSON FOUND for ", contrib['i'] )
                 contrib_type = 'Au'
-                contributor = Contributor(person=p, contribution_type = contrib_type, number = contrib['p'], publication=pub )
+                contributor = Contributor(person=person, contribution_type = contrib_type, number = contrib['p'], publication=pub )
                 contributor.save()
 
             #if 'photo' in request.FILES:
@@ -110,8 +131,9 @@ def edit_publication(request, pubid):
     else: 
         print("##############edit_publication called, GET param is", pubid) 
         pub = Publication.objects.get(pk=pubid)
+        contributors = Contributor.objects.filter(publication=pub).order_by('number');
         form = PublicationForm(instance=pub)
-        context = { 'pub': pub, 'pub_form': form }
+        context = { 'pub': pub, 'contributors': contributors, 'pub_form': form }
         return render(request, 'publications/edit.html', context)
 
 @login_required

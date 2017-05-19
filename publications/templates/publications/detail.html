@@ -35,7 +35,7 @@
                 <td>
                     <ol>
                     {% for c in contributors %}
-                        <li>{{c.number}}. {{ c.person.disp_title }} {{ c.person.disp_given }} {{ c.person.disp_family }} {{ c.person.orcid }}
+                        <li>{{ c.person.disp_title }} {{ c.person.disp_given }} {{ c.person.disp_family }} {{ c.person.orcid }}
                             ({{ c.contribution_type }})</li> 
                     {% endfor %}
                     </ol>

@@ -48,20 +48,48 @@
 
 
                         <div class="contributors">
-			    <div style="float: left;">
-            		       <label id="contrib_list" for="{{ pub_form.contributors.id_for_label }}">Contributors:</label>
-			    </div>
-			    <div style="float: right;">
-			       <button type="button" class="btn btn-default btn-sm sort-contributors" ><span class="glyphicon glyphicon-sort"></span></button>
-			       <button type="button" class="btn fix-contributors" disabled><span class="glyphicon glyphicon-lock"></span></button>
-			    </div>
+			                <div style="float: left;">
+            		            <label id="contrib_list" for="{{ pub_form.contributors.id_for_label }}">Contributors:</label>
+			            </div>
+			            <div style="float: right;">
+			                <button type="button" class="btn btn-default btn-sm sort-contributors" >
+                                <span class="glyphicon glyphicon-sort"></span></button>
+			                <button type="button" class="btn fix-contributors" disabled>
+                                <span class="glyphicon glyphicon-lock"></span></button>
+			            </div>
                             {{ pub_form.contributors.errors }}
                             <div class="contrib_added_row" style="clear: both;">
                                 <ol id="contribs_to_add">
+                                {% for c in contributors %}
+                                    <li id="contrib_entry_{{c.number}}" class="contributor">
+                                        <div>
+                                        {{ c.person.disp_title }} 
+                                        {{ c.person.disp_given }} 
+                                        {{ c.person.disp_family }} 
+                                        ({{ c.person.orcid }})
+                                        ({{ c.contribution_type }}) 
+                                        <button type="button" id="removeContrib_{{c.number}}" 
+                                            class="btn-link remove-contributor" >
+                                               <span class="glyphicon glyphicon-remove-sign"></span></button>
+                                     </div>
+	                                    <input type="hidden" 
+                                            name="contrib_entry_p_{{c.number}}" id="contrib_entry_p_{{c.number}}" value={{c.number}} />
+	                                    <input type="hidden" 
+                                            name="contrib_entry_i_{{c.number}}" id="contrib_entry_i_{{c.number}}" value={{ c.person.id }} />
+	                                    <input type="hidden" 
+                                            name="contrib_entry_t_{{c.number}}" id="contrib_entry_t_{{c.number}}" value={{ c.contribution_type }} />
+	                                    <input type="hidden" 
+                                            name="contrib_entry_g_{{c.number}}" id="contrib_entry_g_{{c.number}}" value={{ c.person.disp_given }} />
+	                                    <input type="hidden" 
+                                            name="contrib_entry_f_{{c.number}}" id="contrib_entry_f_{{c.number}}" value={{ c.person.disp_family }} />
+	                                    <input type="hidden" 
+                                            name="contrib_entry_o_{{c.number}}" id="contrib_entry_o_{{c.number}}" value={{ c.person.orcid }} />
+                                    </li> 
+                                {% endfor %}
                                 </ol>
                             </div>
                             <div class="contrib_row">
-                                <input type="hidden" name="contrib_count" id="contrib_count" value=0 />
+                                <input type="hidden" name="contrib_count" id="contrib_count" value={{ contributors|length }} />
                                 <div id="field">
                                     <input class="contrib_input" id="contrib_t" name="contrib_t" type="text" placeholder="Title" />
                                     <input class="contrib_input" id="contrib_g" name="contrib_g" type="text" placeholder="Given name" />

@@ -6,6 +6,56 @@ if (typeof jQuery === 'undefined') {
   throw new Error('JPrints::Publication JavaScript requires jQuery')
 }
 
+
+
+//
+// utility functions for contributor entry
+//
+function formContributorEntry(personid, pos, title, given, family, orcid ) {
+	var entry = title+" "+given+" "+family+" ("+orcid+")";
+	var p_hidden = '<input type="hidden" name="contrib_entry_p_'+pos+'" id="contrib_entry_p_'+pos+'" value='+pos+' />'
+	var i_hidden = '<input type="hidden" name="contrib_entry_i_'+pos+'" id="contrib_entry_i_'+pos+'" value='+personid+' />'
+	var t_hidden = '<input type="hidden" name="contrib_entry_t_'+pos+'" id="contrib_entry_t_'+pos+'" value='+title+' />'
+	var g_hidden = '<input type="hidden" name="contrib_entry_g_'+pos+'" id="contrib_entry_g_'+pos+'" value='+given+' />'
+	var f_hidden = '<input type="hidden" name="contrib_entry_f_'+pos+'" id="contrib_entry_f_'+pos+'" value='+family+' />'
+	var o_hidden = '<input type="hidden" name="contrib_entry_o_'+pos+'" id="contrib_entry_o_'+pos+'" value='+orcid+' />'
+	var newEntry = '<li id="contrib_entry_'+ pos +'" class="contributor">'+entry;
+        newEntry += ' <button type="button" id="removeContrib_' + pos + '" class="btn-link remove-contributor" >';
+        newEntry += '<span class="glyphicon glyphicon-remove-sign"></span></button>';
+	newEntry += p_hidden;
+	newEntry += i_hidden;
+	newEntry += t_hidden;
+	newEntry += g_hidden;
+	newEntry += f_hidden;
+	newEntry += o_hidden;
+        newEntry += '</li>';
+
+	var contribList = "#contribs_to_add";
+	$(contribList).append(newEntry);
+}
+
+function updateContributorFields(pos) {
+
+	$("#contrib_t").val("");
+	$("#contrib_g").val("");
+	$("#contrib_f").val("");
+	$("#contrib_o").val("");
+	$("#contribs_found").remove();
+
+        $("#contrib_count").val(pos);  
+
+        $('.remove-contributor').click(function(e){
+            	e.preventDefault();
+		var idParts = this.id.split("_");
+		if ( idParts.length == 2 && null != idParts[1] ) {
+                	var contribNum = idParts[1];
+                	var fieldID = "#contrib_entry_" + contribNum;
+                	$(this).remove();
+                	$(fieldID).remove();
+		}
+	});
+}
+
 //
 // add contributors manually
 //
@@ -13,14 +63,10 @@ $(document).ready(function(){
     $(".add-contributor").click(function(e){
         e.preventDefault();
     	var count = $("#contrib_count").val();
-	var tField = $("#contrib_t");
-	var tVal = tField.val();
-	var gField = $("#contrib_g");
-	var gVal = gField.val();
-	var fField = $("#contrib_f");
-	var fVal = fField.val();
-	var oField = $("#contrib_o");
-	var oVal = oField.val();
+	var tVal = $("#contrib_t").val();
+	var gVal = $("#contrib_g").val();
+	var fVal = $("#contrib_f").val();
+	var oVal = $("#contrib_o").val();
 
 	var entry = tVal+" "+gVal+" "+fVal+" ("+oVal+")";
 	entry = entry.trim();
@@ -29,31 +75,12 @@ $(document).ready(function(){
 	}
 
 	var next = Number(count) + 1;
+	var pVal = next.toString();
 
-	var contribList = "#contribs_to_add";
-	var newEntry = '<li id="contrib_entry_'+ next.toString() +'">'+entry;
-        newEntry += ' <button id="removeContrib_' + next.toString() + '" class="btn btn-danger remove-contributor" >-</button>';
-        newEntry += '</li>';
-	tField.val("");
-	gField.val("");
-	fField.val("");
-	oField.val("");
-	$("#contribs_found").remove();
+	formContributorEntry(-1, pVal, tVal, gVal, fVal, oVal);
+	updateContributorFields(pVal);
 
-	$(contribList).append(newEntry);
-        $("#contrib_count").val(next.toString());  
-
-            $('.remove-contributor').click(function(e){
-                e.preventDefault();
-		var idParts = this.id.split("_");
-		if ( idParts.length == 2 && null != idParts[1] ) {
-                	var contribNum = idParts[1];
-                	var fieldID = "#contrib_entry_" + contribNum;
-                	$(this).remove();
-                	$(fieldID).remove();
-		}
-            });
-    });
+   });
     
 });
 
@@ -88,42 +115,10 @@ $(document).on('click', ".sel-contributor", function(e){
 
 	var next = Number(count) + 1;
 	var pVal = next.toString();
-	var contribList = "#contribs_to_add";
-	var newEntry = '<li id="contrib_entry_'+ next.toString() +'">'+entry;
-        newEntry += ' <button id="removeContrib_' + next.toString() + '" class="btn btn-danger remove-contributor" >-</button>';
-        newEntry += '</li>';
-	var p_hidden = '<input type="hidden" name="contrib_entry_p_'+pVal+'" id="contrib_entry_p_'+pVal+'" value='+pVal+' />'
-	var i_hidden = '<input type="hidden" name="contrib_entry_i_'+pVal+'" id="contrib_entry_i_'+pVal+'" value='+iVal+' />'
-	var t_hidden = '<input type="hidden" name="contrib_entry_t_'+pVal+'" id="contrib_entry_t_'+pVal+'" value='+tVal+' />'
-	var g_hidden = '<input type="hidden" name="contrib_entry_g_'+pVal+'" id="contrib_entry_g_'+pVal+'" value='+gVal+' />'
-	var f_hidden = '<input type="hidden" name="contrib_entry_f_'+pVal+'" id="contrib_entry_f_'+pVal+'" value='+fVal+' />'
-	var o_hidden = '<input type="hidden" name="contrib_entry_o_'+pVal+'" id="contrib_entry_o_'+pVal+'" value='+oVal+' />'
 
-	$("#contrib_t").val("");
-	$("#contrib_g").val("");
-	$("#contrib_f").val("");
-	$("#contrib_o").val("");
-	$("#contribs_found").remove();
+	formContributorEntry(iVal, pVal, tVal, gVal, fVal, oVal);
+	updateContributorFields(pVal);
 
-	$(contribList).append(newEntry);
-	$(contribList).append(p_hidden);
-	$(contribList).append(i_hidden);
-	$(contribList).append(t_hidden);
-	$(contribList).append(g_hidden);
-	$(contribList).append(f_hidden);
-	$(contribList).append(o_hidden);
-        $("#contrib_count").val(next.toString());  
-
-            $('.remove-contributor').click(function(e){
-                e.preventDefault();
-		var idParts = this.id.split("_");
-		if ( idParts.length == 2 && null != idParts[1] ) {
-                	var contribNum = idParts[1];
-                	var fieldID = "#contrib_entry_" + contribNum;
-                	$(this).remove();
-                	$(fieldID).remove();
-		}
-            });
     });
     
 
@@ -191,8 +186,16 @@ $(document).ready(function(){
 	var contribList = "#contribs_to_add";
 	$(contribList).sortable({
 		stop: function( event, ui ) {
-			var sorted = this.sortable( "toArray" );
-alert( "sorting stopped: "+sorted);
+			var sorted = $(contribList).sortable( "toArray" );
+			var pos = 1;
+			for (id in sorted) {
+				if (sorted[id].match(/contrib_entry_\d+/)) {
+					var idParts = sorted[id].split("_");
+					var thePosId = "#contrib_entry_p_"+idParts[2];
+					$(thePosId).val(pos);
+					pos++;
+				}
+			}
 		}
 	});
 	$(contribList).sortable( "option", "disabled", false );
@@ -215,7 +218,21 @@ $(document).ready(function(){
     
 });
 
-
+//
+// remove function (for existing contributors, new ones will see the dynamic one)
+//
+$(document).ready(function(){
+	$('.remove-contributor').click(function(e){
+        e.preventDefault();
+	var idParts = this.id.split("_");
+	if ( idParts.length == 2 && null != idParts[1] ) {
+               	var contribNum = idParts[1];
+               	var fieldID = "#contrib_entry_" + contribNum;
+               	$(this).remove();
+               	$(fieldID).remove();
+	}
+        });
+}); 
 
 
 

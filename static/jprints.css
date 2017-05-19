@@ -48,6 +48,17 @@ body {
    background-color: aliceblue;
 }
 
+button.remove-contributor {
+   float:right;
+   color: crimson;
+}
+
+li.contributor {
+   padding-bottom: 8px;
+}
+
+
+
 
 .journal_results {
    background-color: aliceblue;
