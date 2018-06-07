@@ -3,9 +3,13 @@ python:
   - "2.7"
 
 # install dependencies
-install
+install:
   - pip install -r requirements.txt
 
 #run tests
+script:
   - py.test
 
+notifications:
+  email:
+    - jprints@repositoryservices.co.uk
